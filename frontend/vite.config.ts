@@ -24,16 +24,24 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: true,
+    // 确保资源路径正确
+    assetsDir: 'assets',
     rollupOptions: {
       output: {
         manualChunks: {
           'vue-vendor': ['vue', 'vue-router', 'pinia'],
           'element-ui': ['element-plus', '@element-plus/icons-vue'],
           'utils': ['axios', 'dayjs']
-        }
+        },
+        // 确保chunk文件名格式
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash].[ext]'
       }
     }
   },
+  // GitHub Pages部署需要的基础路径
+  base: process.env.NODE_ENV === 'production' ? '/agent-learning-platform/' : '/',
   test: {
     globals: true,
     environment: 'jsdom',
