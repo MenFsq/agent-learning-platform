@@ -1,0 +1,126 @@
+/* CSS变量定义 */
+
+:root {
+  /* 颜色系统 */
+  --color-white: #ffffff;
+  --color-black: #000000;
+  
+  /* 主色调 */
+  --color-primary: #409eff;
+  --color-primary-light-3: #79bbff;
+  --color-primary-light-5: #a0cfff;
+  --color-primary-light-7: #c6e2ff;
+  --color-primary-light-8: #d9ecff;
+  --color-primary-light-9: #ecf5ff;
+  --color-primary-dark-2: #337ecc;
+  
+  /* 成功色 */
+  --color-success: #67c23a;
+  --color-success-light-3: #95d475;
+  --color-success-light-5: #b3e19d;
+  --color-success-light-7: #d1edc4;
+  --color-success-light-8: #e1f3d8;
+  --color-success-light-9: #f0f9eb;
+  --color-success-dark-2: #529b2e;
+  
+  /* 警告色 */
+  --color-warning: #e6a23c;
+  --color-warning-light-3: #eebe77;
+  --color-warning-light-5: #f3d19e;
+  --color-warning-light-7: #f8e3c5;
+  --color-warning-light-8: #faecd8;
+  --color-warning-light-9: #fdf6ec;
+  --color-warning-dark-2: #b88230;
+  
+  /* 危险色 */
+  --color-danger: #f56c6c;
+  --color-danger-light-3: #f89898;
+  --color-danger-light-5: #fab6b6;
+  --color-danger-light-7: #fcd3d3;
+  --color-danger-light-8: #fde2e2;
+  --color-danger-light-9: #fef0f0;
+  --color-danger-dark-2: #c45656;
+  
+  /* 信息色 */
+  --color-info: #909399;
+  --color-info-light-3: #b1b3b8;
+  --color-info-light-5: #c8c9cc;
+  --color-info-light-7: #dedfe0;
+  --color-info-light-8: #e9e9eb;
+  --color-info-light-9: #f4f4f5;
+  --color-info-dark-2: #73767a;
+  
+  /* 文字颜色 */
+  --color-text-primary: #303133;
+  --color-text-regular: #606266;
+  --color-text-secondary: #909399;
+  --color-text-placeholder: #c0c4cc;
+  
+  /* 边框颜色 */
+  --border-color-base: #dcdfe6;
+  --border-color-light: #e4e7ed;
+  --border-color-lighter: #ebeef5;
+  --border-color-extra-light: #f2f6fc;
+  
+  /* 填充颜色 */
+  --fill-color: #f0f2f5;
+  --fill-color-light: #f5f7fa;
+  --fill-color-lighter: #fafafa;
+  --fill-color-extra-light: #fafcff;
+  --fill-color-dark: #ebedf0;
+  --fill-color-darker: #e6e8eb;
+  --fill-color-darkest: #dfe4ed;
+  
+  /* 背景颜色 */
+  --background-color-base: #f5f7fa;
+  
+  /* 字体 */
+  --font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
+  --font-size-extra-large: 20px;
+  --font-size-large: 18px;
+  --font-size-medium: 16px;
+  --font-size-base: 14px;
+  --font-size-small: 13px;
+  --font-size-extra-small: 12px;
+  
+  /* 字体粗细 */
+  --font-weight-primary: 500;
+  --font-weight-secondary: 100;
+  
+  /* 行高 */
+  --line-height-primary: 24px;
+  --line-height-secondary: 16px;
+  
+  /* 边框圆角 */
+  --border-radius-base: 4px;
+  --border-radius-small: 2px;
+  --border-radius-round: 20px;
+  --border-radius-circle: 100%;
+  
+  /* 阴影 */
+  --box-shadow-base: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04);
+  --box-shadow-light: 0 2px 12px 0 rgba(0, 0, 0, .1);
+  
+  /* 禁用透明度 */
+  --disabled-opacity: 0.5;
+  
+  /* 过渡动画 */
+  --transition-duration: .3s;
+  --transition-duration-fast: .2s;
+  --transition-function-ease-in-out-bezier: cubic-bezier(.645, .045, .355, 1);
+  --transition-function-fast-bezier: cubic-bezier(.23, 1, .32, 1);
+  
+  /* 布局 */
+  --header-height: 60px;
+  --sidebar-width: 240px;
+  --sidebar-collapsed-width: 64px;
+  --footer-height: 60px;
+  
+  /* z-index层级 */
+  --z-index-normal: 1;
+  --z-index-top: 1000;
+  --z-index-popper: 2000;
+  --z-index-modal: 3000;
+  --z-index-notification: 4000;
+  --z-index-tooltip: 5000;
+}
