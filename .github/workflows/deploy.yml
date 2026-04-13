@@ -36,8 +36,12 @@ jobs:
         echo "Node版本: $(node --version)"
         echo "npm版本: $(npm --version)"
         
-        # 安装依赖（不使用缓存避免问题）
-        npm install --no-audit --no-fund --loglevel=verbose
+        # 清理并安装依赖
+        rm -rf node_modules package-lock.json
+        npm cache clean --force
+        
+        # 安装所有依赖
+        npm install --no-audit --no-fund
         
         echo "依赖安装完成"
     

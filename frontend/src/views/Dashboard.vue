@@ -630,10 +630,14 @@ const markAllAsRead = () => {
 /* 有机自然风仪表板 */
 .dashboard {
   padding: 20px;
-  min-height: calc(100vh - 72px); /* 减去导航栏高度 */
+  flex: 1;
   background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
   position: relative;
   overflow-x: hidden;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* 允许在flex容器中收缩 */
 }
 
 /* 文化科技风 - 渐变背景特效 */
@@ -1160,16 +1164,19 @@ const markAllAsRead = () => {
 /* 移除自定义card-header，使用Element Plus原生header */
 
 /* 美化卡片header - 添加样式和图标效果 */
-:deep(.el-card__header) {
+.card-header {
   padding: 8px 16px !important;
   border-bottom: 1px solid rgba(226, 232, 240, 0.8) !important;
   background: linear-gradient(90deg, rgba(59, 130, 246, 0.08), rgba(139, 92, 246, 0.05), transparent) !important;
   position: relative;
   overflow: hidden;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 /* header装饰线条 */
-:deep(.el-card__header)::before {
+.card-header::before {
   content: '';
   position: absolute;
   top: 0;
@@ -1181,12 +1188,12 @@ const markAllAsRead = () => {
 }
 
 /* header悬停效果 */
-:deep(.el-card):hover .el-card__header::before {
+.el-card:hover .card-header::before {
   opacity: 1;
   height: 3px;
 }
 
-:deep(.el-card__header h3) {
+.card-header h3 {
   margin: 0 !important;
   font-size: 14px !important;
   font-weight: 700 !important;
@@ -1197,41 +1204,39 @@ const markAllAsRead = () => {
 }
 
 /* 图标样式 */
-:deep(.el-card__header h3 .el-icon) {
+.card-header h3 .el-icon {
   font-size: 16px;
   width: 16px;
   height: 16px;
 }
 
 /* 不同模块的图标颜色 */
-.large-module:nth-child(1) :deep(.el-card__header h3 .el-icon) {
+.large-module:nth-child(1) .card-header h3 .el-icon {
   color: #3b82f6;
 }
 
-.large-module:nth-child(2) :deep(.el-card__header h3 .el-icon) {
+.large-module:nth-child(2) .card-header h3 .el-icon {
   color: #8b5cf6;
 }
 
-.small-module:nth-child(1) :deep(.el-card__header h3 .el-icon) {
+.small-module:nth-child(1) .card-header h3 .el-icon {
   color: #10b981;
 }
 
-.small-module:nth-child(2) :deep(.el-card__header h3 .el-icon) {
+.small-module:nth-child(2) .card-header h3 .el-icon {
   color: #f59e0b;
 }
 
-.small-module:nth-child(3) :deep(.el-card__header h3 .el-icon) {
+.small-module:nth-child(3) .card-header h3 .el-icon {
   color: #ef4444;
 }
 
-.small-module:nth-child(4) :deep(.el-card__header h3 .el-icon) {
+.small-module:nth-child(4) .card-header h3 .el-icon {
   color: #8b5cf6;
 }
 
-/* 移除伪元素图标样式，因为现在使用真实图标 */
-
 /* header按钮样式 */
-:deep(.el-card__header .el-button) {
+.card-header .el-button {
   font-size: 12px !important;
   padding: 2px 8px !important;
   height: 24px !important;
@@ -1239,22 +1244,22 @@ const markAllAsRead = () => {
   font-weight: 500 !important;
 }
 
-:deep(.el-card__header .el-button--primary) {
+.card-header .el-button--primary {
   background: rgba(59, 130, 246, 0.1) !important;
   border-color: rgba(59, 130, 246, 0.3) !important;
   color: #3b82f6 !important;
 }
 
-:deep(.el-card__header .el-button--primary:hover) {
+.card-header .el-button--primary:hover {
   background: rgba(59, 130, 246, 0.2) !important;
   border-color: #3b82f6 !important;
 }
 
-:deep(.el-card__header .el-button--text) {
+.card-header .el-button--text {
   color: #64748b !important;
 }
 
-:deep(.el-card__header .el-button--text:hover) {
+.card-header .el-button--text:hover {
   color: #3b82f6 !important;
 }
 

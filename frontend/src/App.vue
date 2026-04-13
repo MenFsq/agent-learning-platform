@@ -77,7 +77,10 @@ import AppHeader from './components/Layout/AppHeader.vue'
 
 .main-content {
   flex: 1;
+  display: flex;
+  flex-direction: column;
   background: #f8fafc;
+  overflow-y: auto;
 }
 
 /* 页脚样式 */
