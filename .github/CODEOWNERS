@@ -1,0 +1,28 @@
+# CODEOWNERS - 代码所有者配置
+# 此文件定义谁负责审查特定目录的代码更改
+
+# 项目所有者 - 对所有文件有最终审查权
+* @MenFsq
+
+# 前端代码所有者
+/frontend/ @MenFsq
+
+# 后端代码所有者  
+/backend/ @MenFsq
+
+# 文档所有者
+/docs/ @MenFsq
+/README.md @MenFsq
+/ARCHITECTURE.md @MenFsq
+/CONTRIBUTING.md @MenFsq
+
+# 配置文件所有者
+/.github/ @MenFsq
+/.gitignore @MenFsq
+
+# 脚本文件所有者
+/scripts/ @MenFsq
+/*.ps1 @MenFsq
+
+# 许可证文件
+/LICENSE @MenFsq
