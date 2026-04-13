@@ -3,117 +3,93 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [ master ]
-  workflow_dispatch:  # 允许手动触发
+  workflow_dispatch:
 
-# 设置GITHUB_TOKEN的权限
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# 只允许一个并发部署
 concurrency:
   group: "pages"
   cancel-in-progress: true
 
 jobs:
-  build-and-deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  build:
     runs-on: ubuntu-latest
+    env:
+      NODE_ENV: production  # 确保使用生产环境配置
     
     steps:
     - name: 检出代码
       uses: actions/checkout@v4
-      with:
-        fetch-depth: 0  # 获取所有历史记录以便部署到gh-pages分支
     
     - name: 设置Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '24'
-        cache: 'npm'
-        cache-dependency-path: frontend/package-lock.json
     
     - name: 安装依赖
       run: |
         cd frontend
-        npm ci --cache .npm --prefer-offline
+        echo "当前目录: $(pwd)"
+        echo "Node版本: $(node --version)"
+        echo "npm版本: $(npm --version)"
+        
+        # 安装依赖（不使用缓存避免问题）
+        npm install --no-audit --no-fund --loglevel=verbose
+        
+        echo "依赖安装完成"
     
-    - name: 构建前端
+    - name: 构建项目
       run: |
         cd frontend
+        echo "开始构建..."
+        echo "NODE_ENV: $NODE_ENV"
+        
+        # 构建项目
         npm run build
-    
-    - name: 设置Git用户信息
-      run: |
-        git config --global user.name "GitHub Actions"
-        git config --global user.email "actions@github.com"
-    
-    - name: 检查gh-pages分支是否存在
-      id: check-branch
-      run: |
-        if git ls-remote --exit-code --heads origin gh-pages; then
-          echo "branch_exists=true" >> $GITHUB_OUTPUT
+        
+        echo "构建完成，检查输出:"
+        ls -la dist/
+        echo ""
+        echo "检查基础路径配置:"
+        if grep -q "/agent-learning-platform/" dist/index.html; then
+          echo "✅ 基础路径配置正确"
         else
-          echo "branch_exists=false" >> $GITHUB_OUTPUT
+          echo "❌ 基础路径配置错误"
+          exit 1
         fi
     
-    - name: 准备部署目录
-      run: |
-        # 创建临时目录用于部署
-        mkdir -p deploy
-        
-        # 复制构建文件
-        cp -r frontend/dist/* deploy/
-        
-        # 如果有额外的静态文件，也复制过来
-        if [ -d "docs" ]; then
-          cp -r docs/* deploy/ 2>/dev/null || true
-        fi
-        
-        # 确保有.nojekyll文件（禁用Jekyll处理）
-        touch deploy/.nojekyll
-        
-        # 创建CNAME文件（如果需要自定义域名）
-        # echo "your-domain.com" > deploy/CNAME
-    
-    - name: 部署到gh-pages分支
-      uses: JamesIves/github-pages-deploy-action@v4
+    - name: 上传构建产物
+      uses: actions/upload-pages-artifact@v3
       with:
-        branch: gh-pages
-        folder: deploy
-        clean: true
-        clean-exclude: |
-          .nojekyll
-          CNAME
-        git-config-name: "GitHub Actions"
-        git-config-email: "actions@github.com"
+        path: frontend/dist
+  
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
     
-    - name: 等待部署完成
-      run: sleep 30  # 给GitHub Pages一些时间处理
+    steps:
+    - name: 部署到GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
     
     - name: 验证部署
       run: |
         echo "✅ 部署完成！"
-        echo "网站将在几分钟内可用："
-        echo "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
-    
-    - name: 发送部署通知
-      if: success()
-      run: |
-        echo "🚀 Agent Learning Platform 已成功部署到 GitHub Pages!"
         echo ""
         echo "📊 部署详情:"
-        echo "- 分支: gh-pages"
-        echo "- 源目录: frontend/dist"
-        echo "- 部署时间: $(date)"
+        echo "- 仓库: ${{ github.repository }}"
+        echo "- 分支: master"
+        echo "- 构建时间: $(date)"
+        echo "- Node.js版本: 24"
         echo ""
         echo "🔗 访问地址:"
         echo "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
         echo ""
-        echo "📝 备注:"
-        echo "1. 首次部署可能需要几分钟才能生效"
-        echo "2. 如果使用自定义域名，请确保已配置CNAME记录"
-        echo "3. 查看部署状态: https://github.com/${{ github.repository }}/settings/pages"
+        echo "⏳ 首次部署可能需要1-2分钟生效"
+        echo "📱 查看状态: https://github.com/${{ github.repository }}/settings/pages"
