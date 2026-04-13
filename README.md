@@ -10,32 +10,52 @@
 3. **分享** - 在BotLearn社区分享经验
 4. **贡献** - 参与开源项目，积累技术影响力
 
-## 📊 项目结构
+## 📊 项目结构 (前后端分离架构)
 
 ```
 agent-learning-platform/
-├── 📁 modules/              # 核心模块
-│   ├── project-dashboard/   # 项目仪表板模块
-│   ├── learning-guide/      # 学习指南模块
-│   ├── code-examples/       # 代码示例模块
-│   ├── community-integration/ # 社区集成模块
-│   └── deployment-tools/    # 部署工具模块
-├── 📁 docs/                 # 项目文档
-│   ├── tutorials/           # 教程文档
-│   ├── api-reference/       # API参考
-│   └── best-practices/      # 最佳实践
-├── 📁 web-ui/               # 前端界面
-│   ├── dashboard/           # 仪表板界面
-│   ├── learning-path/       # 学习路径界面
-│   └── community-feed/      # 社区动态界面
-├── 📁 backend/              # 后端服务
-│   ├── api-server/          # API服务器
-│   ├── agent-core/          # Agent核心逻辑
-│   └── data-pipeline/       # 数据处理流水线
-└── 📁 deployment/           # 部署配置
-    ├── docker/              # Docker配置
-    ├── kubernetes/          # K8s配置
-    └── ci-cd/               # CI/CD配置
+├── 📁 frontend/                    # 前端项目 (Vue 3 + TypeScript + Vite)
+│   ├── 📁 src/                    # 源代码
+│   │   ├── 📁 components/         # Vue组件
+│   │   ├── 📁 views/             # 页面组件
+│   │   ├── 📁 composables/       # 组合式函数
+│   │   ├── 📁 stores/            # Pinia状态管理
+│   │   ├── 📁 types/             # TypeScript类型
+│   │   └── 📁 utils/             # 工具函数
+│   ├── index.html                # HTML模板
+│   ├── package.json              # 依赖配置
+│   ├── vite.config.ts            # Vite配置
+│   └── README.md                 # 前端文档
+│
+├── 📁 backend/                    # 后端项目 (FastAPI + LangChain + OpenClaw)
+│   ├── 📁 src/                   # 源代码
+│   │   ├── 📁 api/              # API路由
+│   │   ├── 📁 core/             # 核心逻辑
+│   │   ├── 📁 models/           # 数据模型
+│   │   ├── 📁 services/         # 业务服务
+│   │   └── 📁 utils/            # 工具函数
+│   ├── requirements.txt          # Python依赖
+│   ├── Dockerfile               # Docker配置
+│   └── README.md                # 后端文档
+│
+├── 📁 modules/                   # 核心功能模块
+│   ├── project-dashboard/        # 项目仪表板模块
+│   ├── learning-guide/           # 学习指南模块
+│   ├── code-examples/            # 代码示例模块
+│   ├── community-integration/    # 社区集成模块
+│   └── deployment-tools/         # 部署工具模块
+│
+├── 📁 docs/                      # 项目文档
+│   ├── tutorials/                # 教程文档
+│   ├── api-reference/            # API参考
+│   └── best-practices/           # 最佳实践
+│
+├── 📁 scripts/                   # 自动化脚本
+├── 📁 docker/                    # Docker配置
+├── 📄 README.md                  # 项目总览
+├── 📄 ARCHITECTURE.md            # 架构说明文档
+├── 📄 .gitignore                 # Git忽略配置
+└── 📄 docker-compose.yml         # Docker编排配置
 ```
 
 ## 🎨 模块详细介绍
@@ -75,24 +95,53 @@ agent-learning-platform/
 - 日志分析工具
 - 自动化测试套件
 
+## 🏗️ 架构优势
+
+### **前后端分离架构**
+本项目采用现代化的前后端分离架构，具有以下优势：
+
+1. **技术栈独立**
+   - 前端: Vue 3 + TypeScript + Vite
+   - 后端: FastAPI + LangChain + OpenClaw
+   - 各自选择最适合的技术栈
+
+2. **开发效率高**
+   - 前后端并行开发
+   - 独立的开发服务器
+   - 热重载支持
+
+3. **部署灵活**
+   - 可以独立部署前后端
+   - 支持微服务架构
+   - 易于水平扩展
+
+4. **维护方便**
+   - 代码结构清晰
+   - 职责分离明确
+   - 易于团队协作
+
 ## 🚀 技术栈
 
-### 前端技术栈
+### 前端技术栈 (Frontend)
 - **Vue 3** + **TypeScript** - 现代化前端框架
 - **Vite** - 快速构建工具
 - **Element Plus** - UI组件库
 - **ECharts** / **D3.js** - 数据可视化
 - **Pinia** - 状态管理
 - **Vue Router** - 路由管理
+- **Axios** - HTTP客户端
+- **Sass/SCSS** - CSS预处理器
 
-### 后端技术栈
-- **Python 3.9+** - 后端主要语言
+### 后端技术栈 (Backend)
+- **Python 3.10+** - 后端主要语言
 - **FastAPI** - 高性能API框架
 - **LangChain** - AI Agent框架
 - **OpenClaw SDK** - 技能开发工具包
 - **SQLAlchemy** + **Alembic** - 数据库ORM和迁移
+- **PostgreSQL** - 关系型数据库
 - **Redis** - 缓存和消息队列
-- **Celery** - 异步任务队列
+- **JWT** - 认证授权
+- **Pydantic** - 数据验证
 
 ### 数据存储
 - **PostgreSQL** - 主数据库
@@ -175,30 +224,90 @@ agent-learning-platform/
 git clone https://github.com/your-username/agent-learning-platform.git
 cd agent-learning-platform
 
-# 2. 安装依赖
-make install
+# 2. 查看架构文档
+cat ARCHITECTURE.md
+```
 
-# 3. 配置环境
+### 前端开发
+```bash
+# 进入前端目录
+cd frontend
+
+# 安装依赖
+npm install  # 或 yarn install 或 pnpm install
+
+# 启动开发服务器 (默认: http://localhost:5173)
+npm run dev
+
+# 构建生产版本
+npm run build
+
+# 预览生产版本
+npm run preview
+```
+
+### 后端开发
+```bash
+# 进入后端目录
+cd backend
+
+# 创建虚拟环境
+python -m venv venv
+
+# 激活虚拟环境
+# Windows
+venv\Scripts\activate
+# Linux/Mac
+source venv/bin/activate
+
+# 安装依赖
+pip install -r requirements.txt
+
+# 配置环境变量
 cp .env.example .env
-# 编辑 .env 文件，配置API密钥
+# 编辑 .env 文件，配置数据库和API密钥
 
-# 4. 启动开发环境
-make dev
+# 启动开发服务器 (默认: http://localhost:8000)
+uvicorn src.main:app --reload
+
+# 访问API文档
+# Swagger UI: http://localhost:8000/docs
+# ReDoc: http://localhost:8000/redoc
+```
+
+### Docker开发环境
+```bash
+# 使用Docker Compose启动完整环境
+docker-compose up -d
+
+# 查看服务状态
+docker-compose ps
+
+# 查看日志
+docker-compose logs -f
+
+# 停止服务
+docker-compose down
 ```
 
 ### 开发工作流
 ```bash
-# 启动开发服务器
-make dev
+# 前端开发
+cd frontend && npm run dev
+
+# 后端开发
+cd backend && uvicorn src.main:app --reload
 
 # 运行测试
-make test
+cd frontend && npm run test
+cd backend && pytest
 
 # 构建生产版本
-make build
+cd frontend && npm run build
+cd backend && 构建命令
 
 # 部署到生产环境
-make deploy
+参考 deployment/ 目录中的部署脚本
 ```
 
 ## 📊 项目指标
