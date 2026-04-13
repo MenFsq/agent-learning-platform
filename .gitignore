@@ -1,0 +1,168 @@
+# Agent Learning Platform - .gitignore
+
+# 依赖目录
+node_modules/
+venv/
+env/
+ENV/
+.venv/
+
+# 构建产物
+dist/
+build/
+out/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# 运行时数据
+data/
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# 环境变量
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# 编辑器文件
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 操作系统文件
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 测试覆盖率
+coverage/
+.nyc_output
+
+# 临时文件
+tmp/
+temp/
+*.tmp
+*.temp
+
+# 备份文件
+*.bak
+*.backup
+*.old
+
+# 文档生成
+docs/_build/
+docs/_site/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# 数据库文件
+*.db
+*.sqlite
+*.sqlite3
+
+# 缓存文件
+.cache/
+.parcel-cache/
+
+# 包管理器锁文件
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# 配置文件（包含敏感信息）
+config/local.yaml
+config/development.yaml
+config/staging.yaml
+config/production.yaml
+
+# 证书和密钥
+*.pem
+*.key
+*.crt
+*.csr
+
+# 大文件
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# 镜像文件
+*.iso
+*.img
+
+# 媒体文件
+*.mp4
+*.avi
+*.mov
+*.mp3
+*.wav
+
+# 图像文件（除非是项目资源）
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+*.ico
+
+# 文档文件（除非是项目文档）
+*.pdf
+*.doc
+*.docx
+*.xls
+*.xlsx
+*.ppt
+*.pptx
+
+# 项目特定排除
+# 开发环境配置
+.devcontainer/
+.docker/
+.dockerignore
+
+# 监控数据
+prometheus-data/
+grafana-data/
+
+# 向量数据库数据
+chroma-data/
+
+# 备份目录
+backups/
+
+# 导出文件
+exports/
+
+# 用户上传文件
+uploads/
