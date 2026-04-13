@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Deploy to GitHub Pages (Fixed)
 
 on:
   push:
@@ -29,36 +29,45 @@ jobs:
       with:
         fetch-depth: 0  # 获取所有历史记录以便部署到gh-pages分支
     
-    - name: 设置Node.js
+    - name: 设置Node.js 24
       uses: actions/setup-node@v4
       with:
         node-version: '24'
         cache: 'npm'
         cache-dependency-path: frontend/package-lock.json
     
+    - name: 验证Node.js版本
+      run: |
+        echo "Node.js版本: $(node --version)"
+        echo "npm版本: $(npm --version)"
+    
     - name: 安装依赖
       run: |
         cd frontend
-        npm ci --cache .npm --prefer-offline
+        echo "当前目录: $(pwd)"
+        echo "package.json存在: $(test -f package.json && echo '是' || echo '否')"
+        echo "package-lock.json存在: $(test -f package-lock.json && echo '是' || echo '否')"
+        
+        # 清理npm缓存并安装
+        npm cache clean --force
+        npm ci --verbose
     
     - name: 构建前端
       run: |
         cd frontend
+        echo "开始构建..."
         npm run build
+        
+        # 验证构建输出
+        echo "构建完成，检查dist目录:"
+        ls -la dist/
+        echo "index.html内容预览:"
+        head -20 dist/index.html
     
     - name: 设置Git用户信息
       run: |
         git config --global user.name "GitHub Actions"
         git config --global user.email "actions@github.com"
-    
-    - name: 检查gh-pages分支是否存在
-      id: check-branch
-      run: |
-        if git ls-remote --exit-code --heads origin gh-pages; then
-          echo "branch_exists=true" >> $GITHUB_OUTPUT
-        else
-          echo "branch_exists=false" >> $GITHUB_OUTPUT
-        fi
     
     - name: 准备部署目录
       run: |
@@ -66,18 +75,14 @@ jobs:
         mkdir -p deploy
         
         # 复制构建文件
+        echo "复制构建文件..."
         cp -r frontend/dist/* deploy/
-        
-        # 如果有额外的静态文件，也复制过来
-        if [ -d "docs" ]; then
-          cp -r docs/* deploy/ 2>/dev/null || true
-        fi
         
         # 确保有.nojekyll文件（禁用Jekyll处理）
         touch deploy/.nojekyll
         
-        # 创建CNAME文件（如果需要自定义域名）
-        # echo "your-domain.com" > deploy/CNAME
+        echo "部署目录内容:"
+        ls -la deploy/
     
     - name: 部署到gh-pages分支
       uses: JamesIves/github-pages-deploy-action@v4
@@ -97,18 +102,12 @@ jobs:
     - name: 验证部署
       run: |
         echo "✅ 部署完成！"
-        echo "网站将在几分钟内可用："
-        echo "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
-    
-    - name: 发送部署通知
-      if: success()
-      run: |
-        echo "🚀 Agent Learning Platform 已成功部署到 GitHub Pages!"
         echo ""
         echo "📊 部署详情:"
         echo "- 分支: gh-pages"
         echo "- 源目录: frontend/dist"
         echo "- 部署时间: $(date)"
+        echo "- Node.js版本: 24"
         echo ""
         echo "🔗 访问地址:"
         echo "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
@@ -117,3 +116,25 @@ jobs:
         echo "1. 首次部署可能需要几分钟才能生效"
         echo "2. 如果使用自定义域名，请确保已配置CNAME记录"
         echo "3. 查看部署状态: https://github.com/${{ github.repository }}/settings/pages"
+    
+    - name: 发送部署成功通知
+      if: success()
+      run: |
+        echo "🚀 Agent Learning Platform 已成功部署到 GitHub Pages!"
+        echo "修复了Node.js版本问题（使用24版本）"
+        echo "网站已上线: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
+    
+    - name: 发送部署失败通知
+      if: failure()
+      run: |
+        echo "❌ 部署失败！"
+        echo "请检查以下可能的问题:"
+        echo "1. Node.js版本兼容性"
+        echo "2. npm依赖安装问题"
+        echo "3. 构建配置错误"
+        echo "4. GitHub Pages设置"
+        echo ""
+        echo "📋 调试信息:"
+        echo "- 工作流: ${{ github.workflow }}"
+        echo "- 运行ID: ${{ github.run_id }}"
+        echo "- 提交: ${{ github.sha }}"
