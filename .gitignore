@@ -18,6 +18,9 @@ out/
 
 # 运行时数据
 data/
+!frontend/src/data/
+!frontend/src/data/learning/
+!frontend/src/data/learning/langchainCurriculum.ts
 logs/
 *.log
 npm-debug.log*
