@@ -15,18 +15,23 @@ export default defineConfig({
     host: true,
     proxy: {
       '/api': {
-        target: 'http://localhost:8000',
+        target: 'http://localhost:8003',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')
       }
     }
   },
+  // 明确设置SPA模式
+  appType: 'spa',
   build: {
     outDir: 'dist',
     sourcemap: true,
     // 确保资源路径正确
     assetsDir: 'assets',
     rollupOptions: {
+      input: {
+        main: 'index.html'
+      },
       output: {
         manualChunks: {
           'vue-vendor': ['vue', 'vue-router', 'pinia'],

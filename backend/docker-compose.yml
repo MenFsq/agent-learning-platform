@@ -1,0 +1,93 @@
+version: '3.8'
+
+services:
+  backend:
+    build: .
+    container_name: agent-platform-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://user:password@db:5432/agent_platform
+      - REDIS_URL=redis://redis:6379/0
+      - DEBUG=False
+      - ENVIRONMENT=development
+    volumes:
+      - ./logs:/app/logs
+      - ./uploads:/app/uploads
+    depends_on:
+      - db
+      - redis
+    networks:
+      - agent-network
+    restart: unless-stopped
+
+  db:
+    image: postgres:15-alpine
+    container_name: agent-platform-db
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=agent_platform
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - agent-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d agent_platform"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: agent-platform-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - agent-network
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: agent-platform-pgadmin
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@agent-platform.com
+      - PGADMIN_DEFAULT_PASSWORD=admin123
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - agent-network
+    restart: unless-stopped
+    depends_on:
+      - db
+
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: agent-platform-redis-commander
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    ports:
+      - "8081:8081"
+    networks:
+      - agent-network
+    restart: unless-stopped
+    depends_on:
+      - redis
+
+networks:
+  agent-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
+  pgadmin_data:

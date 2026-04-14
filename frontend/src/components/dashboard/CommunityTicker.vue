@@ -5,15 +5,26 @@
     </div>
     <div class="ticker-track">
       <div class="ticker-inner">
-        <router-link
-          v-for="item in duplicatedItems"
-          :key="`${item.id}-${item.title}`"
-          :to="item.href"
-          class="ticker-item"
-        >
-          <strong>{{ item.title }}</strong>
-          <span>{{ item.detail }}</span>
-        </router-link>
+        <template v-for="item in duplicatedItems" :key="`${item.id}-${item.title}`">
+          <a
+            v-if="item.external"
+            :href="item.href"
+            target="_blank"
+            rel="noreferrer noopener"
+            class="ticker-item"
+          >
+            <strong>{{ item.title }}</strong>
+            <span>{{ item.detail }}</span>
+          </a>
+          <router-link
+            v-else
+            :to="item.href"
+            class="ticker-item"
+          >
+            <strong>{{ item.title }}</strong>
+            <span>{{ item.detail }}</span>
+          </router-link>
+        </template>
       </div>
     </div>
   </section>

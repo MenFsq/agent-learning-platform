@@ -228,7 +228,7 @@ const learningItems: LearningItem[] = [
 const quickActions: QuickActionItem[] = [
   { id: 1, title: '项目管理', description: '查看进行中冲刺与版本进度。', icon: FolderGit2, href: '/projects' },
   { id: 2, title: '学习指南', description: '继续当前学习路径与课程卡片。', icon: GraduationCap, href: '/learning' },
-  { id: 3, title: '代码示例', description: '快速打开示例仓库与模板结构。', icon: FileCode2, href: '/projects' },
+  { id: 3, title: 'API 文档', description: '查看后端API文档和测试接口。', icon: FileCode2, href: 'http://localhost:8001/docs', external: true },
   { id: 4, title: '社区问答', description: '跟进精选讨论与高质量回答。', icon: MessagesSquare, href: '/community' },
   { id: 5, title: '部署工具', description: '查看当前构建、发布与运行状态。', icon: Rocket, href: '/projects' },
   { id: 6, title: 'API 控制台', description: '整理接口调用、日志和实验数据。', icon: Blocks, href: '/settings' },
@@ -237,10 +237,10 @@ const quickActions: QuickActionItem[] = [
 ]
 
 const communityFeed: CommunityTickerItem[] = [
-  { id: 1, title: '最新教程', detail: 'LangGraph 流程拆解与状态管理更新', href: '/community' },
-  { id: 2, title: '热门示例', detail: 'Vue + Agent 工具调用模板本周增长最快', href: '/community' },
-  { id: 3, title: '社区精选', detail: 'RAG 与 PromptOps 的实战问答持续升温', href: '/community' },
-  { id: 4, title: '部署提醒', detail: '本周 CI/CD 优化清单已经整理完毕', href: '/community' }
+  { id: 1, title: 'API 文档', detail: '后端API文档已就绪，支持在线测试', href: 'http://localhost:8001/docs', external: true },
+  { id: 2, title: '最新教程', detail: 'LangGraph 流程拆解与状态管理更新', href: '/community' },
+  { id: 3, title: '热门示例', detail: 'Vue + Agent 工具调用模板本周增长最快', href: '/community' },
+  { id: 4, title: '社区精选', detail: 'RAG 与 PromptOps 的实战问答持续升温', href: '/community' }
 ]
 
 const particlesOptions = {

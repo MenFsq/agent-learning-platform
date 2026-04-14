@@ -48,6 +48,15 @@ const routes: RouteRecordRaw[] = [
     }
   },
   {
+    path: '/api-docs',
+    name: 'ApiDocs',
+    component: () => import('@/views/ApiDocs.vue'),
+    meta: {
+      title: 'API文档',
+      requiresAuth: false
+    }
+  },
+  {
     path: '/login',
     name: 'Login',
     component: () => import('@/views/Login.vue'),

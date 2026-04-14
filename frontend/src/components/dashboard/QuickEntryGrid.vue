@@ -7,13 +7,32 @@
     />
 
     <div class="entry-grid">
-      <router-link v-for="item in items" :key="item.id" :to="item.href" class="entry-card">
-        <div class="entry-icon">
-          <component :is="item.icon" />
-        </div>
-        <h3>{{ item.title }}</h3>
-        <p>{{ item.description }}</p>
-      </router-link>
+      <template v-for="item in items" :key="item.id">
+        <a
+          v-if="item.external"
+          :href="item.href"
+          target="_blank"
+          rel="noreferrer noopener"
+          class="entry-card"
+        >
+          <div class="entry-icon">
+            <component :is="item.icon" />
+          </div>
+          <h3>{{ item.title }}</h3>
+          <p>{{ item.description }}</p>
+        </a>
+        <router-link
+          v-else
+          :to="item.href"
+          class="entry-card"
+        >
+          <div class="entry-icon">
+            <component :is="item.icon" />
+          </div>
+          <h3>{{ item.title }}</h3>
+          <p>{{ item.description }}</p>
+        </router-link>
+      </template>
     </div>
   </section>
 </template>

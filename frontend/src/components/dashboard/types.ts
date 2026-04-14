@@ -49,6 +49,7 @@ export interface QuickActionItem {
   description: string
   icon: Component
   href: string
+  external?: boolean
 }
 
 export interface CommunityTickerItem {
@@ -56,4 +57,5 @@ export interface CommunityTickerItem {
   title: string
   detail: string
   href: string
+  external?: boolean
 }

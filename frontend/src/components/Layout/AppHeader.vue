@@ -118,7 +118,8 @@ import {
   Sparkles,
   SunMedium,
   UserRound,
-  Users
+  Users,
+  FileCode
 } from 'lucide-vue-next'
 import { storeToRefs } from 'pinia'
 
@@ -142,6 +143,7 @@ const navItems = [
   { path: '/projects', name: '项目', icon: FolderKanban },
   { path: '/learning', name: '学习', icon: BookOpen },
   { path: '/community', name: '社区', icon: Users },
+  { path: '/api-docs', name: 'API文档', icon: FileCode },
   { path: '/settings', name: '设置', icon: Settings2 }
 ]
 
