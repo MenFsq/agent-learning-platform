@@ -1,0 +1,36 @@
+@mixin glass-panel($background: var(--surface-1), $border: var(--line-soft)) {
+  background: $background;
+  border: 1px solid $border;
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(var(--blur-glass));
+  -webkit-backdrop-filter: blur(var(--blur-glass));
+}
+
+@mixin panel-hover {
+  transition:
+    transform var(--transition-base),
+    border-color var(--transition-base),
+    box-shadow var(--transition-base),
+    background var(--transition-base);
+
+  &:hover {
+    transform: translateY(-2px);
+    border-color: var(--line-strong);
+    box-shadow: var(--glow-primary);
+  }
+}
+
+@mixin section-shell {
+  @include glass-panel();
+  border-radius: var(--radius-xl);
+  position: relative;
+  overflow: hidden;
+}
+
+@mixin hidden-scrollbar {
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

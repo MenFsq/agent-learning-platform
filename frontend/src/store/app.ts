@@ -21,7 +21,7 @@ export interface Notification {
 export const useAppStore = defineStore('app', () => {
   // 状态
   const version = ref('1.0.0')
-  const theme = ref<'light' | 'dark'>('light')
+  const theme = ref<'light' | 'dark'>('dark')
   const sidebarCollapsed = ref(false)
   const loading = ref(false)
   const notifications = ref<Notification[]>([])
@@ -33,20 +33,22 @@ export const useAppStore = defineStore('app', () => {
 
   const appTitle = computed(() => 'Agent Learning Platform')
 
+  const applyTheme = (nextTheme: 'light' | 'dark') => {
+    theme.value = nextTheme
+    localStorage.setItem('theme', nextTheme)
+    document.documentElement.setAttribute('data-theme', nextTheme)
+  }
+
   // 动作
   const initialize = () => {
-    console.log('App initialized')
-    // 从localStorage恢复状态
     const savedTheme = localStorage.getItem('theme')
-    if (savedTheme === 'light' || savedTheme === 'dark') {
-      theme.value = savedTheme
-    }
+    const nextTheme = savedTheme === 'light' || savedTheme === 'dark' ? savedTheme : 'dark'
+
+    applyTheme(nextTheme)
   }
 
   const toggleTheme = () => {
-    theme.value = theme.value === 'light' ? 'dark' : 'light'
-    localStorage.setItem('theme', theme.value)
-    document.documentElement.setAttribute('data-theme', theme.value)
+    applyTheme(theme.value === 'light' ? 'dark' : 'light')
   }
 
   const toggleSidebar = () => {
@@ -96,6 +98,7 @@ export const useAppStore = defineStore('app', () => {
     appTitle,
     
     // 动作
+    applyTheme,
     initialize,
     toggleTheme,
     toggleSidebar,

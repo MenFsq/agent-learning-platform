@@ -1,442 +1,515 @@
 <template>
-  <header class="app-header">
-    <!-- 左侧：Logo和导航 -->
-    <div class="header-left">
-      <div class="logo">
-        <div class="logo-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="url(#gradient)" />
-            <path d="M2 17L12 22L22 17" stroke="url(#gradient)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-            <path d="M2 12L12 17L22 12" stroke="url(#gradient)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-            <defs>
-              <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#3b82f6" />
-                <stop offset="100%" stop-color="#8b5cf6" />
-              </linearGradient>
-            </defs>
-          </svg>
-        </div>
-        <h1 class="logo-text">Agent Learning</h1>
-      </div>
-      
-      <!-- 主导航 -->
-      <nav class="main-nav">
-        <router-link 
-          v-for="item in navItems" 
-          :key="item.path"
-          :to="item.path"
-          class="nav-item"
-          :class="{ active: $route.path === item.path }"
-        >
-          <component :is="item.icon" class="nav-icon" />
-          <span class="nav-text">{{ item.name }}</span>
+  <header class="app-header" :class="{ 'is-scrolled': isScrolled }">
+    <div class="header-shell page-container">
+      <div class="header-left">
+        <router-link to="/" class="brand">
+          <span class="brand-mark">
+            <BrainCircuit />
+          </span>
+          <span class="brand-copy">
+            <strong>Agent Learning</strong>
+            <small>AI Agent Workspace</small>
+          </span>
         </router-link>
-      </nav>
-    </div>
 
-    <!-- 右侧：用户操作 -->
-    <div class="header-right">
-      <!-- 搜索框 -->
-      <div class="search-box">
-        <el-input
-          v-model="searchQuery"
-          placeholder="搜索项目、教程..."
-          size="small"
-          :prefix-icon="Search"
-          class="search-input"
-        />
+        <nav class="main-nav" aria-label="主导航">
+          <router-link
+            v-for="item in navItems"
+            :key="item.path"
+            :to="item.path"
+            class="nav-item"
+            :class="{ active: route.path === item.path }"
+          >
+            <component :is="item.icon" class="nav-icon" />
+            <span class="nav-text">{{ item.name }}</span>
+          </router-link>
+        </nav>
       </div>
 
-      <!-- 通知 -->
-      <el-dropdown trigger="click" class="notification-dropdown">
-        <div class="notification-btn">
-          <el-badge :value="3" :max="99" class="badge">
-            <Bell class="icon" />
-          </el-badge>
+      <div class="header-right">
+        <div class="search-box">
+          <el-input
+            v-model="searchQuery"
+            placeholder="搜索项目、教程、Agent..."
+            :prefix-icon="Search"
+            class="search-input"
+          />
         </div>
-        <template #dropdown>
-          <el-dropdown-menu>
-            <el-dropdown-item>
-              <div class="notification-item">
-                <div class="notification-icon success">
-                  <CheckCircle class="icon-small" />
-                </div>
-                <div class="notification-content">
-                  <div class="notification-title">项目构建成功</div>
-                  <div class="notification-time">2分钟前</div>
-                </div>
-              </div>
-            </el-dropdown-item>
-            <el-dropdown-item>
-              <div class="notification-item">
-                <div class="notification-icon warning">
-                  <AlertTriangle class="icon-small" />
-                </div>
-                <div class="notification-content">
-                  <div class="notification-title">系统更新可用</div>
-                  <div class="notification-time">1小时前</div>
-                </div>
-              </div>
-            </el-dropdown-item>
-            <el-dropdown-item>
-              <div class="notification-item">
-                <div class="notification-icon info">
-                  <Info class="icon-small" />
-                </div>
-                <div class="notification-content">
-                  <div class="notification-title">新教程发布</div>
-                  <div class="notification-time">3小时前</div>
-                </div>
-              </div>
-            </el-dropdown-item>
-          </el-dropdown-menu>
-        </template>
-      </el-dropdown>
 
-      <!-- 用户信息 -->
-      <el-dropdown trigger="click" class="user-dropdown">
-        <div class="user-info">
-          <el-avatar :size="36" :src="user.avatar" class="user-avatar" />
-          <div class="user-details">
-            <div class="user-name">{{ user.name }}</div>
-            <div class="user-role">{{ user.role }}</div>
-          </div>
-          <ChevronDown class="dropdown-arrow" />
-        </div>
-        <template #dropdown>
-          <el-dropdown-menu>
-            <el-dropdown-item>
-              <User class="dropdown-icon" />
-              个人资料
-            </el-dropdown-item>
-            <el-dropdown-item>
-              <Settings class="dropdown-icon" />
-              系统设置
-            </el-dropdown-item>
-            <el-dropdown-item divided>
-              <LogOut class="dropdown-icon" />
-              退出登录
-            </el-dropdown-item>
-          </el-dropdown-menu>
-        </template>
-      </el-dropdown>
+        <button
+          type="button"
+          class="icon-button"
+          :aria-label="theme === 'dark' ? '切换到浅色模式' : '切换到深色模式'"
+          @click="appStore.toggleTheme"
+        >
+          <SunMedium v-if="theme === 'dark'" class="icon" />
+          <MoonStar v-else class="icon" />
+        </button>
+
+        <el-dropdown trigger="click" placement="bottom-end">
+          <button type="button" class="icon-button">
+            <el-badge :value="unreadCount" :hidden="unreadCount === 0" :max="99">
+              <Bell class="icon" />
+            </el-badge>
+          </button>
+          <template #dropdown>
+            <el-dropdown-menu class="menu-panel">
+              <el-dropdown-item
+                v-for="item in notificationPreview"
+                :key="item.title"
+                class="menu-item"
+              >
+                <div class="notice-item">
+                  <span class="notice-dot" :class="item.tone"></span>
+                  <div>
+                    <div class="notice-title">{{ item.title }}</div>
+                    <div class="notice-time">{{ item.time }}</div>
+                  </div>
+                </div>
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+
+        <el-dropdown trigger="click" placement="bottom-end">
+          <button type="button" class="profile-button">
+            <el-avatar :size="34" :src="user.avatar" />
+            <div class="profile-copy">
+              <span>{{ user.name }}</span>
+              <small>{{ user.role }}</small>
+            </div>
+            <ChevronDown class="profile-arrow" />
+          </button>
+          <template #dropdown>
+            <el-dropdown-menu class="menu-panel">
+              <el-dropdown-item class="menu-item">
+                <UserRound class="dropdown-icon" />
+                个人资料
+              </el-dropdown-item>
+              <el-dropdown-item class="menu-item">
+                <Sparkles class="dropdown-icon" />
+                工作台偏好
+              </el-dropdown-item>
+              <el-dropdown-item class="menu-item">
+                <Settings2 class="dropdown-icon" />
+                系统设置
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+      </div>
     </div>
   </header>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
-// import { useRouter } from 'vue-router' // 暂时注释掉未使用的导入
-import { 
-  Home, 
-  FolderKanban, 
-  BookOpen, 
-  Users,
-  Settings as SettingsIcon,
-  Search,
+import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
+import { useRoute } from 'vue-router'
+import {
   Bell,
-  CheckCircle,
-  AlertTriangle,
-  Info,
-  User,
-  Settings,
-  LogOut,
-  ChevronDown
+  BookOpen,
+  BrainCircuit,
+  ChevronDown,
+  FolderKanban,
+  LayoutDashboard,
+  MoonStar,
+  Search,
+  Settings2,
+  Sparkles,
+  SunMedium,
+  UserRound,
+  Users
 } from 'lucide-vue-next'
+import { storeToRefs } from 'pinia'
 
-// const router = useRouter() // 暂时注释掉未使用的变量
+import { useAppStore } from '@/store/app'
+
+const route = useRoute()
+const appStore = useAppStore()
+const { theme } = storeToRefs(appStore)
+
 const searchQuery = ref('')
+const isScrolled = ref(false)
 
-// 用户信息
 const user = reactive({
-  name: '小老虎 🐯',
-  role: '管理员',
-  avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=tiger&backgroundColor=3b82f6&hairColor=8b5cf6'
+  name: '小老虎',
+  role: 'Workspace Owner',
+  avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=agent-learning'
 })
 
-// 导航项
 const navItems = [
-  { path: '/', name: '仪表板', icon: Home },
+  { path: '/', name: '仪表板', icon: LayoutDashboard },
   { path: '/projects', name: '项目', icon: FolderKanban },
   { path: '/learning', name: '学习', icon: BookOpen },
   { path: '/community', name: '社区', icon: Users },
-  { path: '/settings', name: '设置', icon: SettingsIcon }
+  { path: '/settings', name: '设置', icon: Settings2 }
 ]
+
+const notificationPreview = [
+  { title: '项目构建成功，部署环境已同步', time: '2 分钟前', tone: 'success' },
+  { title: '新的 LangChain 学习路径已上线', time: '18 分钟前', tone: 'info' },
+  { title: '社区精选问答更新，适合继续阅读', time: '1 小时前', tone: 'accent' }
+]
+
+const unreadCount = computed(() => notificationPreview.length)
+
+const handleScroll = () => {
+  isScrolled.value = window.scrollY > 8
+}
+
+onMounted(() => {
+  handleScroll()
+  window.addEventListener('scroll', handleScroll, { passive: true })
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('scroll', handleScroll)
+})
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@use '@/styles/mixins' as *;
+
 .app-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 32px;
-  height: 72px;
-  background: white;
-  border-bottom: 1px solid #f0f2f5;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-  position: sticky;
-  top: 0;
+  position: fixed;
+  inset: 0 0 auto;
+  height: var(--header-height);
   z-index: 1000;
+  border-bottom: 1px solid transparent;
+  transition:
+    background var(--transition-base),
+    border-color var(--transition-base),
+    box-shadow var(--transition-base);
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(7, 10, 18, 0.74), rgba(7, 10, 18, 0.4));
+    backdrop-filter: blur(calc(var(--blur-glass) + 6px));
+    -webkit-backdrop-filter: blur(calc(var(--blur-glass) + 6px));
+    border-bottom: 1px solid var(--line-soft);
+  }
 }
 
-/* 左侧区域 */
-.header-left {
+[data-theme='light'] .app-header::before {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(255, 255, 255, 0.72));
+}
+
+.app-header.is-scrolled {
+  border-color: var(--line-soft);
+  box-shadow: var(--shadow-soft);
+}
+
+.header-shell {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
-  gap: 48px;
+  justify-content: space-between;
+  gap: 20px;
 }
 
-/* Logo */
-.logo {
+.header-left,
+.header-right {
   display: flex;
+  align-items: center;
+}
+
+.header-left {
+  gap: 28px;
+  min-width: 0;
+}
+
+.header-right {
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.brand {
+  display: inline-flex;
   align-items: center;
   gap: 12px;
+  min-width: 0;
 }
 
-.logo-icon {
-  width: 32px;
-  height: 32px;
+.brand-mark {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.88), rgba(139, 92, 246, 0.82));
+  border: 1px solid rgba(191, 219, 254, 0.34);
+  color: #ffffff;
+  box-shadow: 0 12px 28px rgba(59, 130, 246, 0.28);
+}
+
+[data-theme='light'] .brand-mark {
+  background: linear-gradient(135deg, rgba(29, 78, 216, 0.94), rgba(124, 58, 237, 0.88));
+  border-color: rgba(59, 130, 246, 0.22);
+  color: #ffffff;
+}
+
+.brand-copy {
   display: flex;
+  flex-direction: column;
+  gap: 2px;
+  line-height: 1.1;
+
+  strong {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--text-primary);
+  }
+
+  small {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+}
+
+.main-nav {
+  @include glass-panel(rgba(255, 255, 255, 0.03), var(--line-soft));
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px;
+  border-radius: 999px;
+}
+
+[data-theme='light'] .main-nav {
+  background: rgba(255, 255, 255, 0.74);
+}
+
+.nav-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  color: var(--text-secondary);
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast),
+    transform var(--transition-fast);
+
+  &:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.05);
+    transform: translateY(-1px);
+  }
+
+  &.active {
+    color: #ffffff;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.92), rgba(6, 182, 212, 0.82));
+    box-shadow: 0 12px 24px rgba(59, 130, 246, 0.22);
+  }
+}
+
+[data-theme='light'] .nav-item.active {
+  color: #ffffff;
+}
+
+.nav-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.nav-text {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.search-box {
+  width: min(28vw, 280px);
+}
+
+.search-input :deep(.el-input__wrapper) {
+  background: rgba(255, 255, 255, 0.03);
+  box-shadow: none;
+  border-radius: 14px;
+  min-height: 42px;
+  border: 1px solid var(--line-soft);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.search-input :deep(.el-input__wrapper.is-focus) {
+  border-color: rgba(59, 130, 246, 0.48);
+  box-shadow: var(--glow-primary);
+}
+
+.search-input :deep(.el-input__inner) {
+  color: var(--text-primary);
+}
+
+.icon-button,
+.profile-button {
+  @include glass-panel(rgba(255, 255, 255, 0.03), var(--line-soft));
+  border-radius: 14px;
+  border: 0;
+  color: var(--text-secondary);
+  min-height: 42px;
+  transition:
+    transform var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    background var(--transition-fast);
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-1px);
+    color: var(--text-primary);
+    border-color: var(--line-strong);
+  }
+}
+
+.icon-button {
+  width: 42px;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
 }
 
-.logo-text {
-  font-size: 20px;
-  font-weight: 700;
-  color: #1a1a1a;
-  margin: 0;
-  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* 主导航 */
-.main-nav {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 16px;
-  border-radius: 10px;
-  text-decoration: none;
-  color: #666;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.2s ease;
-}
-
-.nav-item:hover {
-  background: #f5f7fa;
-  color: #3b82f6;
-}
-
-.nav-item.active {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
-  color: #3b82f6;
-  font-weight: 600;
-}
-
-.nav-icon {
+.icon {
   width: 18px;
   height: 18px;
 }
 
-/* 右侧区域 */
-.header-right {
-  display: flex;
+.profile-button {
+  display: inline-flex;
   align-items: center;
-  gap: 24px;
+  gap: 10px;
+  padding: 4px 10px 4px 6px;
 }
 
-/* 搜索框 */
-.search-box {
-  width: 280px;
-}
-
-.search-input :deep(.el-input__wrapper) {
-  border-radius: 10px;
-  border: 1px solid #e4e7ed;
-  background: #f8fafc;
-}
-
-.search-input :deep(.el-input__wrapper:hover) {
-  border-color: #cbd5e1;
-}
-
-.search-input :deep(.el-input__wrapper.is-focus) {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.2);
-}
-
-/* 通知 */
-.notification-btn {
-  padding: 8px;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-.notification-btn:hover {
-  background: #f5f7fa;
-}
-
-.notification-btn .icon {
-  width: 20px;
-  height: 20px;
-  color: #64748b;
-}
-
-.notification-btn:hover .icon {
-  color: #3b82f6;
-}
-
-.badge :deep(.el-badge__content) {
-  border: 2px solid white;
-}
-
-/* 通知下拉菜单 */
-.notification-item {
+.profile-copy {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px;
-  min-width: 280px;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.1;
+
+  span {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  small {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
 }
 
-.notification-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.notification-icon.success {
-  background: rgba(34, 197, 94, 0.1);
-  color: #16a34a;
-}
-
-.notification-icon.warning {
-  background: rgba(245, 158, 11, 0.1);
-  color: #d97706;
-}
-
-.notification-icon.info {
-  background: rgba(59, 130, 246, 0.1);
-  color: #2563eb;
-}
-
-.icon-small {
-  width: 16px;
-  height: 16px;
-}
-
-.notification-content {
-  flex: 1;
-}
-
-.notification-title {
-  font-size: 14px;
-  font-weight: 500;
-  color: #1a1a1a;
-  margin-bottom: 2px;
-}
-
-.notification-time {
-  font-size: 12px;
-  color: #94a3b8;
-}
-
-/* 用户信息 */
-.user-dropdown {
-  cursor: pointer;
-}
-
-.user-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 8px;
-  border-radius: 12px;
-  transition: background 0.2s ease;
-}
-
-.user-info:hover {
-  background: #f5f7fa;
-}
-
-.user-avatar {
-  border: 2px solid #f0f2f5;
-}
-
-.user-details {
-  text-align: left;
-}
-
-.user-name {
-  font-size: 14px;
-  font-weight: 600;
-  color: #1a1a1a;
-}
-
-.user-role {
-  font-size: 12px;
-  color: #94a3b8;
-}
-
-.dropdown-arrow {
-  width: 16px;
-  height: 16px;
-  color: #94a3b8;
-}
-
-/* 下拉菜单图标 */
+.profile-arrow,
 .dropdown-icon {
   width: 16px;
   height: 16px;
-  margin-right: 8px;
-  vertical-align: middle;
 }
 
-/* 响应式设计 */
-@media (max-width: 1024px) {
-  .app-header {
-    padding: 0 20px;
+.menu-panel {
+  padding: 6px;
+  background: transparent;
+}
+
+.menu-item {
+  border-radius: 12px;
+  color: var(--text-secondary);
+}
+
+.notice-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 280px;
+  padding: 6px 4px;
+}
+
+.notice-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  margin-top: 6px;
+  flex-shrink: 0;
+
+  &.success {
+    background: var(--color-success);
   }
-  
-  .header-left {
-    gap: 24px;
+
+  &.info {
+    background: var(--color-primary);
   }
-  
-  .search-box {
-    width: 200px;
+
+  &.accent {
+    background: var(--color-accent);
   }
-  
-  .nav-text {
+}
+
+.notice-title {
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.notice-time {
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.icon-button :deep(.el-badge__content) {
+  border-color: var(--app-bg-elevated);
+}
+
+@media (max-width: 1180px) {
+  .nav-text,
+  .profile-copy {
     display: none;
   }
-  
+
+  .main-nav {
+    padding: 6px;
+  }
+
   .nav-item {
-    padding: 12px;
+    padding-inline: 12px;
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 920px) {
   .search-box {
     display: none;
   }
-  
-  .logo-text {
+
+  .header-shell {
+    gap: 12px;
+  }
+
+  .header-left {
+    gap: 14px;
+  }
+}
+
+@media (max-width: 720px) {
+  .brand-copy small,
+  .brand-copy strong {
     display: none;
+  }
+
+  .main-nav {
+    gap: 2px;
+  }
+
+  .nav-item {
+    padding: 10px;
   }
 }
 </style>

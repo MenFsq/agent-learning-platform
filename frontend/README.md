@@ -1,292 +1,242 @@
-# Agent Learning Platform - 前端项目
+# Agent Learning Platform Frontend
 
-## 🎯 项目概述
+## 项目概述
 
-这是 Agent Learning Platform 的前端项目，基于 Vue 3 + TypeScript + Vite 构建的现代化 Web 应用。
+这是 `Agent Learning Platform` 的前端工程，基于 `Vue 3 + TypeScript + Vite` 构建，当前重点实现的是一个偏工作台形态的 AI Agent 学习与项目协作界面。
 
-## 🚀 快速开始
+目前已经成型的核心体验包括：
 
-### 环境要求
-- Node.js 18+ 
-- npm 9+ 或 yarn 1.22+ 或 pnpm 8+
+- 仪表板首页：展示项目进度、学习进度、快捷入口和社区动态
+- 学习工作台：用可交互的知识地图串联阶段、节点、资料和学习动作
+- 顶部工作台导航：统一承载搜索、通知、主题切换和用户入口
+- 全局视觉系统：暗色默认、支持亮色切换，统一使用设计 token 和玻璃态面板风格
+
+## 环境要求
+
+- `Node.js >= 24`
+- `npm >= 10`
+
+以上要求以 `package.json` 中的 `engines` 配置为准。
+
+## 快速开始
 
 ### 安装依赖
+
 ```bash
 npm install
-# 或
-yarn install
-# 或
-pnpm install
 ```
 
-### 启动开发服务器
+### 启动开发环境
+
 ```bash
 npm run dev
-# 或
-yarn dev
-# 或
-pnpm dev
 ```
 
-### 构建生产版本
+默认使用 Vite 本地服务：
+
+- 地址：`http://localhost:5174`
+- API 代理：`/api -> http://localhost:8000`
+
+### 构建生产包
+
 ```bash
 npm run build
-# 或
-yarn build
-# 或
-pnpm build
 ```
 
-### 预览生产版本
+### 本地预览构建结果
+
 ```bash
 npm run preview
-# 或
-yarn preview
-# 或
-pnpm preview
 ```
 
-## 📁 项目结构
+### 其他常用脚本
 
+```bash
+npm run lint
+npm run format
+npm run type-check
+npm run test
+npm run test:ui
+npm run test:coverage
 ```
+
+## 当前页面与路由
+
+| 路由 | 页面 | 当前状态 |
+| --- | --- | --- |
+| `/` | 仪表板 `Dashboard.vue` | 已完成主要展示结构 |
+| `/learning` | 学习工作台 `Learning.vue` | 已完成核心交互和地图工作区 |
+| `/projects` | 项目管理 `Projects.vue` | 预留占位页 |
+| `/community` | 社区动态 `Community.vue` | 预留占位页 |
+| `/settings` | 系统设置 `Settings.vue` | 预留占位页 |
+| `/login` | 登录页 `Login.vue` | 独立页面，不显示主头部 |
+| `/:pathMatch(.*)*` | 404 `NotFound.vue` | 兜底路由 |
+
+## 当前实现重点
+
+### 1. 仪表板首页
+
+首页位于 `src/views/Dashboard.vue`，目前由多个卡片化模块组成：
+
+- `DashboardHero`：顶部欢迎区和关键指标
+- `OverviewStats`：进度、任务、学习完成率、运行次数等概览
+- `ProjectShowcase`：项目进展卡片
+- `LearningRail`：学习路径横向卡片流
+- `QuickEntryGrid`：快捷入口
+- `CommunityTicker`：社区动态播报
+
+页面还集成了 `tsparticles` 背景粒子效果，以及基于 `IntersectionObserver` 的滚动 reveal 动画。
+
+### 2. 学习工作台
+
+学习页位于 `src/views/Learning.vue`，围绕 “先看整体，再钻细节” 的使用路径组织：
+
+- 顶部 Hero 区：学习主题说明和快捷动作按钮
+- 学习概览：阶段数量、节点数量等总览指标
+- 阶段节奏：推荐学习顺序和时间预期
+- 核心工作区：交互式知识地图
+- 学习原则：总结当前页面的学习方式
+
+知识地图工作区由 `src/components/LangChainMindMap.vue` 负责组装，内部主要包含：
+
+- `LearningMapCanvas`：基于 `@vue-flow/core` 的节点/连线画布
+- `LearningStagePanel`：阶段视图与节点切换
+- `LearningNodeDetail`：当前节点详细说明
+- `LearningResourcePanel`：资料面板
+- `LearningLegend`：图例说明
+
+### 3. 顶部工作台导航
+
+顶部导航位于 `src/components/Layout/AppHeader.vue`，当前包含：
+
+- 主导航入口：仪表板、项目、学习、社区、设置
+- 搜索框：用于统一搜索入口展示
+- 主题切换：深浅色切换
+- 通知预览：下拉通知卡片
+- 用户菜单：个人资料、偏好和系统设置入口
+
+## 技术栈
+
+### 框架与基础设施
+
+- `Vue 3`
+- `TypeScript`
+- `Vite`
+- `Vue Router`
+- `Pinia`
+
+### UI 与交互
+
+- `Element Plus`
+- `lucide-vue-next`
+- `@vue-flow/core`
+- `particles.vue3`
+- `@tsparticles/slim`
+
+### 工程化
+
+- `ESLint`
+- `Prettier`
+- `Vitest`
+- `Vue Test Utils`
+- `vue-tsc`
+
+## 项目结构
+
+当前项目结构更接近下面这种组织方式：
+
+```text
 frontend/
-├── 📁 src/                    # 源代码目录
-│   ├── 📁 assets/            # 静态资源
-│   │   ├── 📁 images/        # 图片资源
-│   │   ├── 📁 styles/        # 样式文件
-│   │   └── 📁 fonts/         # 字体文件
-│   ├── 📁 components/        # 公共组件
-│   │   ├── 📁 common/        # 通用组件
-│   │   ├── 📁 layout/        # 布局组件
-│   │   └── 📁 ui/            # UI组件
-│   ├── 📁 views/             # 页面组件
-│   │   ├── Home.vue          # 首页
-│   │   ├── Dashboard.vue     # 仪表板
-│   │   ├── Learning.vue      # 学习页面
-│   │   ├── Projects.vue      # 项目页面
-│   │   └── Community.vue     # 社区页面
-│   ├── 📁 composables/       # 组合式函数
-│   │   ├── useApi.ts         # API调用
-│   │   ├── useAuth.ts        # 认证逻辑
-│   │   ├── useProjects.ts    # 项目管理
-│   │   └── useLearning.ts    # 学习管理
-│   ├── 📁 stores/            # Pinia状态管理
-│   │   ├── auth.ts           # 认证状态
-│   │   ├── projects.ts       # 项目状态
-│   │   ├── learning.ts       # 学习状态
-│   │   └── ui.ts             # UI状态
-│   ├── 📁 types/             # TypeScript类型定义
-│   │   ├── api.ts            # API类型
-│   │   ├── project.ts        # 项目类型
-│   │   ├── user.ts           # 用户类型
-│   │   └── learning.ts       # 学习类型
-│   ├── 📁 utils/             # 工具函数
-│   │   ├── api.ts            # API工具
-│   │   ├── validation.ts     # 数据验证
-│   │   ├── formatter.ts      # 数据格式化
-│   │   └── constants.ts      # 常量定义
-│   ├── 📁 router/            # 路由配置
-│   │   └── index.ts          # 路由定义
-│   ├── App.vue               # 根组件
-│   └── main.ts               # 应用入口
-├── index.html                # HTML模板
-├── package.json              # 项目配置
-├── vite.config.ts            # Vite配置
-├── tsconfig.json             # TypeScript配置
-├── .env                      # 环境变量
-├── .env.development          # 开发环境变量
-├── .env.production           # 生产环境变量
-└── README.md                 # 项目文档
+├── src/
+│   ├── App.vue
+│   ├── main.ts
+│   ├── router/
+│   │   └── index.ts
+│   ├── store/
+│   │   └── app.ts
+│   ├── views/
+│   │   ├── Dashboard.vue
+│   │   ├── Learning.vue
+│   │   ├── Projects.vue
+│   │   ├── Community.vue
+│   │   ├── Settings.vue
+│   │   ├── Login.vue
+│   │   └── NotFound.vue
+│   ├── components/
+│   │   ├── Layout/
+│   │   │   └── AppHeader.vue
+│   │   ├── dashboard/
+│   │   │   ├── DashboardHero.vue
+│   │   │   ├── OverviewStats.vue
+│   │   │   ├── ProjectShowcase.vue
+│   │   │   ├── LearningRail.vue
+│   │   │   ├── QuickEntryGrid.vue
+│   │   │   ├── CommunityTicker.vue
+│   │   │   ├── SectionHeader.vue
+│   │   │   ├── AnimatedNumber.vue
+│   │   │   └── types.ts
+│   │   ├── learning/
+│   │   │   ├── LearningMapCanvas.vue
+│   │   │   ├── LearningStagePanel.vue
+│   │   │   ├── LearningNodeDetail.vue
+│   │   │   ├── LearningResourcePanel.vue
+│   │   │   └── LearningLegend.vue
+│   │   └── LangChainMindMap.vue
+│   ├── composables/
+│   │   └── useCountUp.ts
+│   └── styles/
+│       ├── global.scss
+│       ├── mixins.scss
+│       └── tokens.scss
+├── vite.config.ts
+├── package.json
+└── README.md
 ```
 
-## 🔧 技术栈
+## 样式与主题
 
-### 核心框架
-- **Vue 3** - 渐进式 JavaScript 框架
-- **TypeScript** - 类型安全的 JavaScript 超集
-- **Vite** - 下一代前端构建工具
+样式系统主要分为三层：
 
-### 状态管理
-- **Pinia** - Vue 官方推荐的状态管理库
+- `src/styles/tokens.scss`：定义颜色、圆角、间距、动效、字体与 Element Plus 变量映射
+- `src/styles/mixins.scss`：沉淀可复用的面板、滚动条、悬停等样式 mixin
+- `src/styles/global.scss`：全局 reset、页面背景、渐变文本、reveal 动画等基础样式
 
-### UI框架
-- **Element Plus** - 基于 Vue 3 的组件库
-- **Vue Router** - 官方路由管理器
+主题默认是 `dark`，并通过 `Pinia` 中的 `app` store 负责：
 
-### 开发工具
-- **ESLint** - 代码检查
-- **Prettier** - 代码格式化
-- **Husky** - Git hooks
-- **Commitlint** - Commit 消息规范
+- 读取本地 `theme`
+- 切换 `light` / `dark`
+- 同步 `document.documentElement[data-theme]`
 
-### 测试工具
-- **Vitest** - 单元测试框架
-- **Vue Test Utils** - Vue 组件测试工具
-- **Cypress** - E2E 测试框架
+## 路由与认证说明
 
-## 🌐 API集成
+- 页面标题在路由守卫中动态设置
+- 开发环境会跳过认证检查
+- 开发环境启动时会自动写入一个模拟 `token` 和 `user`
+- 生产环境下，访问需要认证的页面时会检查 `localStorage` 中的 `token`
 
-### 配置
-在 `.env` 文件中配置后端 API 地址：
-```env
-VITE_API_BASE_URL=http://localhost:8000/api
-VITE_API_TIMEOUT=30000
-```
+这意味着本地联调时几乎可以直接进入工作台页面，无需额外登录流程。
 
-### API调用示例
-```typescript
-import { api } from '@/utils/api'
+## 构建与部署说明
 
-// 获取项目列表
-const projects = await api.get('/projects')
+- 构建输出目录为 `dist/`
+- 生产环境 `base` 会切换为 `/agent-learning-platform/`
+- 已配置基础的 `manualChunks`，将 `vue`、`element-plus` 和 `utils` 相关依赖拆分输出
+- 构建默认生成 `sourcemap`
 
-// 创建项目
-const newProject = await api.post('/projects', {
-  name: '新项目',
-  description: '项目描述'
-})
+如果部署到 GitHub Pages，当前 `vite.config.ts` 已包含对应的基础路径处理。
 
-// 更新项目
-const updatedProject = await api.put(`/projects/${id}`, {
-  name: '更新后的项目名'
-})
+## 开发建议
 
-// 删除项目
-await api.delete(`/projects/${id}`)
-```
+- 优先在 `views/` 组织页面层结构，在 `components/dashboard/` 和 `components/learning/` 中承载模块化 UI
+- 全局主题相关改动优先从 `tokens.scss` 入手，避免直接写死颜色
+- 如果新增学习地图能力，优先沿用现有 “地图画布 + 节点详情 + 阶段面板 + 资料面板” 的工作区拆分方式
+- `dist/` 和构建产物属于生成文件，不建议手动修改
 
-## 🎨 样式方案
+## 仓库信息
 
-### CSS预处理器
-- **Sass/SCSS** - CSS 预处理器
-
-### 设计系统
-- **CSS Variables** - 自定义属性
-- **BEM命名规范** - 组件样式命名
-- **响应式设计** - 移动端优先
-
-### 主题系统
-支持亮色/暗色主题切换，通过 CSS 变量实现。
-
-## 📱 响应式设计
-
-### 断点定义
-```scss
-$breakpoints: (
-  'xs': 0,
-  'sm': 576px,
-  'md': 768px,
-  'lg': 992px,
-  'xl': 1200px,
-  'xxl': 1400px
-);
-```
-
-### 移动端优化
-- 触摸友好的交互
-- 移动端导航菜单
-- 图片懒加载
-- 性能优化
-
-## 🔐 安全考虑
-
-### 认证授权
-- JWT Token 存储
-- 路由守卫
-- 权限控制
-
-### 数据安全
-- XSS 防护
-- CSRF 防护
-- 输入验证
-
-### 代码安全
-- 依赖安全扫描
-- 代码审查
-- 安全最佳实践
-
-## 🚀 性能优化
-
-### 构建优化
-- 代码分割
-- 懒加载路由
-- 图片压缩
-- Tree Shaking
-
-### 运行时优化
-- 虚拟滚动
-- 防抖节流
-- 缓存策略
-- 预加载
-
-### 监控分析
-- 性能监控
-- 错误追踪
-- 用户行为分析
-
-## 📊 开发规范
-
-### 代码规范
-- ESLint + Prettier 统一代码风格
-- TypeScript 严格模式
-- 组件命名规范
-
-### Git规范
-- Conventional Commits
-- 分支管理策略
-- Code Review 流程
-
-### 测试规范
-- 单元测试覆盖率 > 80%
-- E2E 测试关键路径
-- 集成测试 API
-
-## 🐳 部署
-
-### 构建命令
-```bash
-# 开发环境
-npm run build:dev
-
-# 生产环境
-npm run build:prod
-
-# 预览
-npm run preview
-```
-
-### Docker部署
-```dockerfile
-# Dockerfile
-FROM node:18-alpine as builder
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci
-COPY . .
-RUN npm run build
-
-FROM nginx:alpine
-COPY --from=builder /app/dist /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/nginx.conf
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
-```
-
-## 🤝 贡献指南
-
-1. Fork 项目
-2. 创建功能分支
-3. 提交代码
-4. 发起 Pull Request
-5. 等待 Code Review
-
-## 📞 支持与反馈
-
-- 问题反馈: GitHub Issues
-- 功能建议: GitHub Discussions
-- 文档改进: Pull Request
+- Repository: [MenFsq/agent-learning-platform](https://github.com/MenFsq/agent-learning-platform)
+- Homepage: [https://menfsq.github.io/agent-learning-platform/](https://menfsq.github.io/agent-learning-platform/)
 
 ---
 
-**最后更新**: 2026-04-13  
-**维护者**: 小老虎 🐯
+最后更新：`2026-04-14`

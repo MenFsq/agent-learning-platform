@@ -1,226 +1,315 @@
-<template>
+﻿<template>
   <div class="learning-page">
-    <!-- LangChain学习思维导图组件 -->
-    <LangChainMindMap />
-    
-    <!-- 其他学习内容可以在这里添加 -->
-    <div class="additional-content">
-      <div class="content-section">
-        <h2>🎯 学习原则</h2>
-        <div class="principles-grid">
-          <div class="principle-card">
-            <div class="principle-icon">📝</div>
-            <div class="principle-title">一步步来</div>
-            <div class="principle-desc">按照4个阶段21天的计划逐步学习，不跳步</div>
+    <div class="page-container">
+      <div class="learning-shell">
+        <section class="hero-section">
+          <div class="hero-copy">
+            <p class="eyebrow">学习工作台</p>
+            <h1 class="text-gradient">{{ learningMapMeta.title }}</h1>
+            <p class="hero-description">{{ learningMapMeta.description }}</p>
+
+            <div class="hero-actions">
+              <button
+                v-for="action in learningActions"
+                :key="action.id"
+                type="button"
+                class="hero-action"
+                @click="handleAction(action)"
+              >
+                <span>{{ action.label }}</span>
+                <small>{{ action.helperText }}</small>
+              </button>
+            </div>
           </div>
-          <div class="principle-card">
-            <div class="principle-icon">✅</div>
-            <div class="principle-title">多验证</div>
-            <div class="principle-desc">每个概念都要动手实践，确保真正掌握</div>
+
+          <div class="hero-summary">
+            <p class="summary-label">你可以先这样使用</p>
+            <ul>
+              <li>先看阶段顺序，知道整条路线的推进节奏。</li>
+              <li>再点地图节点，把概念、练习、验证和资料串起来看。</li>
+            </ul>
           </div>
-          <div class="principle-card">
-            <div class="principle-icon">🔗</div>
-            <div class="principle-title">项目集成</div>
-            <div class="principle-desc">将学习成果集成到实际项目中，创造价值</div>
+        </section>
+
+        <section class="section-block">
+          <SectionHeader
+            eyebrow="学习概览"
+            title="先建立整体坐标，再进入细节"
+            description="先把阶段数、关键节点数和验证维度看清楚，后面点开地图时就不容易迷路。"
+          />
+
+          <div class="overview-grid">
+            <article v-for="item in learningOverviewStats" :key="item.label" class="overview-card">
+              <p class="stat-label">{{ item.label }}</p>
+              <strong class="metric-mono">{{ item.value }}</strong>
+              <p class="stat-detail">{{ item.detail }}</p>
+            </article>
           </div>
-          <div class="principle-card">
-            <div class="principle-icon">🌐</div>
-            <div class="principle-title">社区分享</div>
-            <div class="principle-desc">在BotLearn社区分享经验，建立技术影响力</div>
+        </section>
+
+        <section class="section-block">
+          <SectionHeader
+            eyebrow="阶段节奏"
+            title="推荐学习顺序"
+            description="这一行不是详细说明，而是帮你快速建立推进顺序和时间预期。"
+          />
+
+          <div class="stage-rail">
+            <article v-for="stage in learningStages" :key="stage.id" class="stage-pill">
+              <p class="stage-pill-label">第 {{ stage.order }} 阶段</p>
+              <strong>{{ stage.label }}</strong>
+              <span class="metric-mono">{{ stage.duration }}</span>
+            </article>
           </div>
-        </div>
-      </div>
-      
-      <div class="content-section">
-        <h2>🚀 立即开始</h2>
-        <div class="start-actions">
-          <button class="action-btn primary" @click="startLearning">
-            <span class="btn-icon">🐯</span>
-            <span class="btn-text">开始第一阶段学习</span>
-          </button>
-          <button class="action-btn secondary" @click="viewResources">
-            <span class="btn-icon">📚</span>
-            <span class="btn-text">查看学习资源</span>
-          </button>
-          <button class="action-btn outline" @click="downloadPlan">
-            <span class="btn-icon">💾</span>
-            <span class="btn-text">下载学习计划</span>
-          </button>
-        </div>
+        </section>
+
+        <section class="section-block">
+          <SectionHeader
+            eyebrow="核心工作区"
+            title="从地图进入内容，再从内容回到路线"
+            description="左侧先看结构和路径，右侧聚焦当前节点的详细信息，下面再补阶段任务和资料。"
+          />
+          <LangChainMindMap ref="mindMapRef" />
+        </section>
+
+        <section class="principles-panel">
+          <SectionHeader
+            eyebrow="学习原则"
+            title="建议一直保持的三条习惯"
+            description="这些不是装饰性的提示，而是最直接影响学习质量和落地效率的工程习惯。"
+          />
+
+          <div class="principles-grid">
+            <article v-for="principle in learningPrinciples" :key="principle.id" class="principle-card">
+              <h3>{{ principle.title }}</h3>
+              <p>{{ principle.description }}</p>
+              <strong>{{ principle.emphasis }}</strong>
+            </article>
+          </div>
+        </section>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
+
+import SectionHeader from '@/components/dashboard/SectionHeader.vue'
 import LangChainMindMap from '@/components/LangChainMindMap.vue'
+import {
+  learningActions,
+  learningMapMeta,
+  learningOverviewStats,
+  learningPrinciples,
+  learningStages,
+  type LearningAction
+} from '@/data/learning/langchainCurriculum'
 
-const startLearning = () => {
-  // 这里可以添加开始学习的逻辑
-  alert('开始第一阶段：环境搭建与基础概念学习')
-}
+const mindMapRef = ref<{
+  runAction?: (action: LearningAction) => Promise<void> | void
+} | null>(null)
 
-const viewResources = () => {
-  // 这里可以添加查看资源的逻辑
-  window.open('https://github.com/liaokongVFX/LangChain-Chinese-Getting-Started-Guide', '_blank')
-}
-
-const downloadPlan = () => {
-  // 这里可以添加下载学习计划的逻辑
-  alert('学习计划下载功能将在后续版本中实现')
+const handleAction = async (action: LearningAction) => {
+  await mindMapRef.value?.runAction?.(action)
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@use '@/styles/mixins' as *;
+
 .learning-page {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: 100%;
 }
 
-.additional-content {
-  max-width: 1200px;
+.learning-shell {
+  width: min(1320px, 100%);
   margin: 0 auto;
-  padding: 40px 20px;
-}
-
-.content-section {
-  background: white;
-  border-radius: 15px;
-  padding: 30px;
-  margin-bottom: 30px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-}
-
-.content-section h2 {
-  font-size: 1.8rem;
-  color: #667eea;
-  margin-bottom: 25px;
-  padding-bottom: 10px;
-  border-bottom: 3px solid #667eea;
-}
-
-/* 原则网格 */
-.principles-grid {
+  padding: clamp(28px, 4vw, 42px) 0 48px;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 32px;
+}
+
+.hero-section,
+.overview-card,
+.stage-pill,
+.principles-panel,
+.principle-card {
+  @include section-shell;
+}
+
+.hero-section {
+  padding: clamp(28px, 4vw, 40px);
+  display: grid;
+  gap: 28px;
+  grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.8fr);
+  align-items: stretch;
+}
+
+.section-block {
+  display: grid;
+  gap: 18px;
+}
+
+.eyebrow,
+.summary-label,
+.stage-pill-label,
+.stat-label {
+  margin: 0;
+  color: var(--color-secondary);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(34px, 5vw, 56px);
+  line-height: 1.05;
+}
+
+.hero-description {
+  max-width: 760px;
+  margin: 18px 0 0;
+  color: var(--text-secondary);
+  font-size: 17px;
+  line-height: 1.8;
+}
+
+.hero-actions {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 14px;
+}
+
+.hero-action {
+  @include panel-hover;
+  padding: 16px 18px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--line-soft);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-primary);
+  cursor: pointer;
+  display: grid;
+  gap: 6px;
+  text-align: left;
+
+  span {
+    font-weight: 700;
+    font-size: 16px;
+  }
+
+  small {
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+}
+
+.hero-summary {
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--line-soft);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 22px;
+  display: grid;
+  gap: 16px;
+  align-content: start;
+
+  ul {
+    margin: 0;
+    padding-left: 18px;
+    color: var(--text-secondary);
+    display: grid;
+    gap: 12px;
+    line-height: 1.7;
+  }
+}
+
+.overview-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.overview-card {
+  padding: 20px;
+  display: grid;
+  gap: 10px;
+
+  strong {
+    font-size: clamp(28px, 4vw, 40px);
+  }
+}
+
+.stat-detail {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.stage-rail {
+  @include hidden-scrollbar;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(220px, 1fr);
+  gap: 14px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+
+.stage-pill {
+  padding: 18px;
+  display: grid;
+  gap: 8px;
+
+  strong {
+    font-size: 18px;
+  }
+
+  span {
+    color: var(--text-secondary);
+  }
+}
+
+.principles-panel {
+  padding: 24px;
+  display: grid;
   gap: 20px;
 }
 
+.principles-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
 .principle-card {
-  text-align: center;
-  padding: 25px;
-  background: #f8f9fa;
-  border-radius: 10px;
-  transition: all 0.3s ease;
-  border: 2px solid transparent;
+  @include panel-hover;
+  padding: 18px;
+  display: grid;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--line-soft);
+
+  h3,
+  p,
+  strong {
+    margin: 0;
+  }
+
+  p {
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+
+  strong {
+    color: var(--text-primary);
+  }
 }
 
-.principle-card:hover {
-  background: white;
-  border-color: #667eea;
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(102, 126, 234, 0.1);
-}
-
-.principle-icon {
-  font-size: 3rem;
-  margin-bottom: 15px;
-}
-
-.principle-title {
-  font-size: 1.3rem;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 10px;
-}
-
-.principle-desc {
-  color: #666;
-  font-size: 0.95rem;
-  line-height: 1.5;
-}
-
-/* 开始行动按钮 */
-.start-actions {
-  display: flex;
-  gap: 15px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.action-btn {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 15px 25px;
-  border-radius: 10px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  border: none;
-  min-width: 200px;
-  justify-content: center;
-}
-
-.action-btn.primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-}
-
-.action-btn.primary:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-}
-
-.action-btn.secondary {
-  background: #4CAF50;
-  color: white;
-}
-
-.action-btn.secondary:hover {
-  background: #45a049;
-  transform: translateY(-3px);
-  box-shadow: 0 10px 20px rgba(76, 175, 80, 0.3);
-}
-
-.action-btn.outline {
-  background: transparent;
-  color: #667eea;
-  border: 2px solid #667eea;
-}
-
-.action-btn.outline:hover {
-  background: #667eea;
-  color: white;
-  transform: translateY(-3px);
-}
-
-.btn-icon {
-  font-size: 1.2rem;
-}
-
-.btn-text {
-  white-space: nowrap;
-}
-
-/* 响应式设计 */
-@media (max-width: 768px) {
-  .principles-grid {
+@media (max-width: 960px) {
+  .hero-section {
     grid-template-columns: 1fr;
-  }
-  
-  .start-actions {
-    flex-direction: column;
-  }
-  
-  .action-btn {
-    width: 100%;
-    min-width: unset;
-  }
-  
-  .content-section {
-    padding: 20px;
   }
 }
 </style>
