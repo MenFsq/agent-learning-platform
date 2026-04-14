@@ -17,9 +17,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      NODE_ENV: production  # 确保使用生产环境配置
-    
+
     steps:
     - name: 检出代码
       uses: actions/checkout@v4
@@ -46,6 +44,8 @@ jobs:
         echo "依赖安装完成"
     
     - name: 构建项目
+      env:
+        NODE_ENV: production
       run: |
         cd frontend
         echo "开始构建..."
