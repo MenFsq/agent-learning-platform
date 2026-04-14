@@ -30,13 +30,6 @@
           </article>
         </div>
 
-        <div class="brand-feature-panel">
-          <p class="feature-panel-label">进入平台后你会看到</p>
-          <ul class="feature-list">
-            <li v-for="feature in platformFeatures" :key="feature">{{ feature }}</li>
-          </ul>
-        </div>
-
         <div class="workspace-preview">
           <div class="preview-orbit" aria-hidden="true">
             <span class="orbit-ring orbit-ring-outer"></span>
@@ -71,47 +64,15 @@
               </div>
             </div>
           </div>
-
-          <div class="floating-panel floating-panel-primary">
-            <span>Focus Window</span>
-            <strong class="metric-mono">4.6h</strong>
-            <p>深度工作时间保持稳定。</p>
-          </div>
-
-          <div class="floating-panel floating-panel-secondary">
-            <span>Community Signal</span>
-            <strong class="metric-mono">+12</strong>
-            <p>有新的高质量反馈可跟进。</p>
-          </div>
         </div>
       </section>
 
       <section class="login-card">
         <div class="card-glow-line"></div>
-        <div class="login-focus-banner">
-          <span class="focus-dot"></span>
-          <strong>主入口</strong>
-          <p>在这里输入账号后，点击主按钮即可进入工作台。</p>
-        </div>
-
         <div class="login-header">
           <p class="panel-tag">Sign In</p>
           <h2>登录进入工作台</h2>
-          <p>先完成登录，再继续你的项目、学习与协作上下文。</p>
-        </div>
-
-        <div class="login-badges">
-          <span v-for="badge in loginBadges" :key="badge" class="login-badge">{{ badge }}</span>
-        </div>
-
-        <div class="system-status-strip">
-          <article v-for="status in systemStatus" :key="status.label" class="status-item">
-            <span class="status-dot" :class="status.tone"></span>
-            <div>
-              <strong>{{ status.label }}</strong>
-              <p>{{ status.detail }}</p>
-            </div>
-          </article>
+          <p>输入账号信息后即可继续访问项目与学习内容。</p>
         </div>
 
         <el-form
@@ -121,11 +82,6 @@
           class="login-form"
           @submit.prevent="handleLogin"
         >
-          <div class="primary-action-guide">
-            <span>请先填写账号信息</span>
-            <strong>然后点击下方“登录并进入工作台”</strong>
-          </div>
-
           <el-form-item prop="username">
             <el-input
               v-model="loginForm.username"
@@ -175,11 +131,6 @@
                 <button type="button" class="quick-login-chip" @click="quickLogin('guest')">访客</button>
               </div>
             </div>
-
-            <div class="login-note">
-              <span class="login-note-title">Workspace Access</span>
-              <p>登录后即可进入统一工作台，继续项目、课程与社区协作的上下文。</p>
-            </div>
           </div>
         </el-form>
       </section>
@@ -203,13 +154,6 @@ const platformMetrics = [
   { label: '社区反馈', value: '12', detail: '最新讨论可直接跟进' }
 ]
 
-const platformFeatures = [
-  '项目仪表板与阶段进度跟踪',
-  '学习路线、知识地图与资料导航',
-  '代码示例、实验记录与部署入口',
-  '社区问答与高质量反馈整合'
-]
-
 const workspaceFlow = [
   { step: '01', title: 'Sprint Review', detail: '聚焦项目冲刺、风险点和当日优先级。' },
   { step: '02', title: 'Learning Route', detail: '延续 LangChain 学习路径和阶段进度。' },
@@ -220,14 +164,6 @@ const previewSignals = [
   { label: 'Run Count', value: '128' },
   { label: 'Progress', value: '84%' },
   { label: 'Active Tasks', value: '09' }
-]
-
-const loginBadges = ['Unified workspace', 'Dark glass UI', 'Fast demo access']
-
-const systemStatus = [
-  { label: 'Project Sync', detail: '冲刺与进度状态已同步', tone: 'is-primary' },
-  { label: 'Learning Context', detail: '学习路线可从上次位置继续', tone: 'is-secondary' },
-  { label: 'Access Ready', detail: '演示账号可直接快速进入', tone: 'is-success' }
 ]
 
 const particlesOptions = {
@@ -464,10 +400,10 @@ const quickLogin = (type: string) => {
 }
 
 .login-shell {
-  width: min(1160px, 100%);
+  width: min(1120px, 100%);
   display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(420px, 500px);
-  gap: clamp(24px, 4vw, 48px);
+  grid-template-columns: minmax(0, 0.76fr) minmax(420px, 520px);
+  gap: clamp(24px, 3vw, 40px);
   align-items: center;
   position: relative;
   z-index: 1;
@@ -475,8 +411,8 @@ const quickLogin = (type: string) => {
 
 .brand-panel {
   display: grid;
-  gap: 28px;
-  padding: clamp(8px, 2vw, 20px);
+  gap: 24px;
+  padding: clamp(4px, 1.5vw, 12px);
   opacity: 0.88;
   transform: scale(0.985);
 }
@@ -485,12 +421,9 @@ const quickLogin = (type: string) => {
 .login-title,
 .login-subtitle,
 .brand-metrics,
-.brand-feature-panel,
 .workspace-preview,
 .card-glow-line,
 .login-header,
-.login-badges,
-.system-status-strip,
 .login-form {
   opacity: 0;
   animation: lift-in 780ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
@@ -512,12 +445,8 @@ const quickLogin = (type: string) => {
   animation-delay: 300ms;
 }
 
-.brand-feature-panel {
-  animation-delay: 380ms;
-}
-
 .workspace-preview {
-  animation-delay: 460ms;
+  animation-delay: 380ms;
 }
 
 .card-glow-line {
@@ -528,16 +457,8 @@ const quickLogin = (type: string) => {
   animation-delay: 240ms;
 }
 
-.login-badges {
-  animation-delay: 320ms;
-}
-
-.system-status-strip {
-  animation-delay: 400ms;
-}
-
 .login-form {
-  animation-delay: 480ms;
+  animation-delay: 320ms;
 }
 
 .brand-headline {
@@ -596,7 +517,6 @@ const quickLogin = (type: string) => {
 .metric-card p,
 .quick-login-label,
 .demo-account span,
-.login-note-title,
 .preview-signal span {
   margin: 0;
   color: var(--color-secondary);
@@ -627,7 +547,6 @@ const quickLogin = (type: string) => {
 }
 
 .metric-card,
-.brand-feature-panel,
 .login-card {
   @include section-shell;
 }
@@ -658,11 +577,6 @@ const quickLogin = (type: string) => {
 .metric-card span {
   color: var(--text-secondary);
   line-height: 1.6;
-}
-
-.brand-feature-panel {
-  padding: 24px;
-  background: rgba(255, 255, 255, 0.04);
 }
 
 .workspace-preview {
@@ -866,76 +780,6 @@ const quickLogin = (type: string) => {
   font-size: 18px;
 }
 
-.floating-panel {
-  position: absolute;
-  min-width: 180px;
-  padding: 14px 16px;
-  border-radius: 18px;
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 20px 40px rgba(6, 9, 16, 0.28);
-  animation: panel-float 7s ease-in-out infinite;
-}
-
-.floating-panel span,
-.floating-panel p,
-.floating-panel strong {
-  display: block;
-  margin: 0;
-}
-
-.floating-panel strong {
-  margin-top: 6px;
-  font-size: 26px;
-}
-
-.floating-panel p {
-  margin-top: 4px;
-  color: var(--text-secondary);
-  line-height: 1.5;
-}
-
-.floating-panel-primary {
-  top: 0;
-  right: -12px;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.18), rgba(6, 182, 212, 0.08));
-}
-
-.floating-panel-secondary {
-  left: 8px;
-  bottom: -6px;
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.16), rgba(255, 255, 255, 0.05));
-  animation-delay: -3s;
-}
-
-.feature-list {
-  list-style: none;
-  margin: 18px 0 0;
-  padding: 0;
-  display: grid;
-  gap: 14px;
-}
-
-.feature-list li {
-  position: relative;
-  padding-left: 18px;
-  color: var(--text-secondary);
-  line-height: 1.7;
-}
-
-.feature-list li::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 11px;
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  background: linear-gradient(135deg, var(--color-secondary), var(--color-accent));
-  box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.12);
-}
-
 .login-card {
   padding: clamp(28px, 4vw, 36px);
   background: rgba(255, 255, 255, 0.06);
@@ -978,42 +822,6 @@ const quickLogin = (type: string) => {
   box-shadow: 0 0 26px rgba(59, 130, 246, 0.3);
 }
 
-.login-focus-banner {
-  display: grid;
-  grid-template-columns: auto auto 1fr;
-  align-items: center;
-  gap: 10px 12px;
-  margin-bottom: 18px;
-  padding: 14px 16px;
-  border-radius: 18px;
-  border: 1px solid rgba(59, 130, 246, 0.2);
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(139, 92, 246, 0.06));
-}
-
-.focus-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-  background: linear-gradient(135deg, var(--color-secondary), var(--color-primary));
-  box-shadow: 0 0 16px rgba(59, 130, 246, 0.42);
-}
-
-.login-focus-banner strong,
-.login-focus-banner p {
-  margin: 0;
-}
-
-.login-focus-banner strong {
-  color: var(--text-primary);
-  font-size: 14px;
-}
-
-.login-focus-banner p {
-  color: var(--text-secondary);
-  font-size: 13px;
-  line-height: 1.6;
-}
-
 .login-header {
   display: grid;
   gap: 10px;
@@ -1032,124 +840,9 @@ const quickLogin = (type: string) => {
   line-height: 1.7;
 }
 
-.login-badges {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 18px;
-}
-
-.login-badge {
-  position: relative;
-  padding: 8px 12px;
-  padding-left: 26px;
-  border-radius: 999px;
-  border: 1px solid var(--line-soft);
-  background: rgba(255, 255, 255, 0.04);
-  color: var(--text-secondary);
-  font-size: 12px;
-}
-
-.login-badge::before {
-  content: '';
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  width: 7px;
-  height: 7px;
-  border-radius: 999px;
-  transform: translateY(-50%);
-  background: linear-gradient(135deg, var(--color-secondary), var(--color-accent));
-  box-shadow: 0 0 12px rgba(59, 130, 246, 0.3);
-}
-
-.system-status-strip {
-  display: grid;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.status-item {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 12px;
-  padding: 12px 14px;
-  border-radius: 16px;
-  border: 1px solid var(--line-soft);
-  background: rgba(255, 255, 255, 0.03);
-}
-
-.status-item:hover .status-dot {
-  transform: scale(1.12);
-  box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.04);
-}
-
-.status-item strong,
-.status-item p {
-  margin: 0;
-}
-
-.status-item strong {
-  font-size: 13px;
-  color: var(--text-primary);
-}
-
-.status-item p {
-  margin-top: 4px;
-  color: var(--text-secondary);
-  font-size: 13px;
-  line-height: 1.6;
-}
-
-.status-dot {
-  width: 10px;
-  height: 10px;
-  margin-top: 5px;
-  border-radius: 999px;
-  box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.03);
-  transition: transform var(--transition-base), box-shadow var(--transition-base);
-}
-
-.status-dot.is-primary {
-  background: var(--color-primary);
-}
-
-.status-dot.is-secondary {
-  background: var(--color-secondary);
-}
-
-.status-dot.is-success {
-  background: var(--color-success);
-}
-
 .login-form {
   display: grid;
   gap: 8px;
-}
-
-.primary-action-guide {
-  margin-bottom: 14px;
-  padding: 12px 14px;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px dashed rgba(255, 255, 255, 0.12);
-  display: grid;
-  gap: 4px;
-}
-
-.primary-action-guide span,
-.primary-action-guide strong {
-  margin: 0;
-}
-
-.primary-action-guide span {
-  color: var(--text-secondary);
-  font-size: 12px;
-}
-
-.primary-action-guide strong {
-  color: var(--text-primary);
-  font-size: 14px;
 }
 
 .login-form :deep(.el-form-item) {
@@ -1251,19 +944,6 @@ const quickLogin = (type: string) => {
 .quick-login {
   display: grid;
   gap: 12px;
-}
-
-.login-note {
-  padding: 14px 16px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--line-soft);
-}
-
-.login-note p {
-  margin: 8px 0 0;
-  color: var(--text-secondary);
-  line-height: 1.7;
 }
 
 .quick-login-actions {
@@ -1376,17 +1056,6 @@ const quickLogin = (type: string) => {
   }
 }
 
-@keyframes panel-float {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-
-  50% {
-    transform: translateY(-8px);
-  }
-}
-
 @keyframes signal-glow {
   0%,
   100% {
@@ -1432,10 +1101,6 @@ const quickLogin = (type: string) => {
     padding-inline: 0;
   }
 
-  .floating-panel-primary {
-    right: 0;
-  }
-
   .ambient-orb {
     width: 320px;
     height: 320px;
@@ -1476,11 +1141,6 @@ const quickLogin = (type: string) => {
     grid-template-columns: 1fr;
   }
 
-  .floating-panel {
-    position: static;
-    margin-top: 14px;
-  }
-
   .preview-orbit {
     display: none;
   }
@@ -1505,12 +1165,9 @@ const quickLogin = (type: string) => {
   .login-title,
   .login-subtitle,
   .brand-metrics,
-  .brand-feature-panel,
   .workspace-preview,
   .card-glow-line,
   .login-header,
-  .login-badges,
-  .system-status-strip,
   .login-form {
     opacity: 1;
     animation: none;
@@ -1523,7 +1180,6 @@ const quickLogin = (type: string) => {
   .preview-surface::before,
   .preview-flow-item,
   .preview-signal,
-  .floating-panel,
   .login-button::after {
     animation: none;
   }
