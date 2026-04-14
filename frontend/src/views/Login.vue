@@ -1,6 +1,5 @@
 <template>
   <div class="login-container">
-    <Particles id="login-particles" :options="particlesOptions as any" class="particles-layer" />
     <div class="ambient-grid"></div>
     <div class="ambient-orb ambient-orb-left"></div>
     <div class="ambient-orb ambient-orb-right"></div>
@@ -17,124 +16,121 @@
           </div>
         </div>
 
+        <p class="brand-caption">AI agent workflow cockpit</p>
         <h1 class="login-title text-gradient">Agent Learning Platform</h1>
         <p class="login-subtitle">
-          把项目推进、学习路径和社区反馈收拢到同一套工作台里，用更轻的界面承接你的 Agent 开发节奏。
+          用一套更轻、更流动的工作台，把项目推进、学习路线和部署检查组织在同一个上下文里。
         </p>
 
-        <div class="brand-metrics">
-          <article v-for="metric in platformMetrics" :key="metric.label" class="metric-card">
-            <p>{{ metric.label }}</p>
-            <strong class="metric-mono">{{ metric.value }}</strong>
-            <span>{{ metric.detail }}</span>
+        <div class="dynamic-stage">
+          <div class="stage-grid"></div>
+          <div class="stage-core">
+            <p class="feature-panel-label">Live Canvas</p>
+            <strong>One context, multiple lanes</strong>
+            <p>项目、学习、部署和反馈在一张动态画布里持续联动。</p>
+          </div>
+
+          <article
+            v-for="node in orbitNodes"
+            :key="node.title"
+            class="orbit-node"
+            :class="node.className"
+          >
+            <span>{{ node.label }}</span>
+            <strong>{{ node.title }}</strong>
+            <p>{{ node.detail }}</p>
           </article>
-        </div>
-
-        <div class="workspace-preview">
-          <div class="preview-orbit" aria-hidden="true">
-            <span class="orbit-ring orbit-ring-outer"></span>
-            <span class="orbit-ring orbit-ring-inner"></span>
-            <span class="orbit-node orbit-node-one"></span>
-            <span class="orbit-node orbit-node-two"></span>
-          </div>
-
-          <div class="preview-surface">
-            <div class="preview-header">
-              <div>
-                <p class="feature-panel-label">Workspace Preview</p>
-                <strong>今日重点推进</strong>
-              </div>
-              <span class="preview-badge">Synced</span>
-            </div>
-
-            <div class="preview-flow">
-              <article v-for="item in workspaceFlow" :key="item.title" class="preview-flow-item">
-                <span class="preview-step-index metric-mono">{{ item.step }}</span>
-                <div>
-                  <strong>{{ item.title }}</strong>
-                  <p>{{ item.detail }}</p>
-                </div>
-              </article>
-            </div>
-
-            <div class="preview-footer">
-              <div v-for="item in previewSignals" :key="item.label" class="preview-signal">
-                <span>{{ item.label }}</span>
-                <strong class="metric-mono">{{ item.value }}</strong>
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 
       <section class="login-card">
-        <div class="card-glow-line"></div>
-        <div class="login-header">
-          <p class="panel-tag">Sign In</p>
-          <h2>登录进入工作台</h2>
-          <p>输入账号信息后即可继续访问项目与学习内容。</p>
-        </div>
+        <div class="login-card-body">
+          <div class="card-glow-line"></div>
 
-        <el-form
-          ref="loginFormRef"
-          :model="loginForm"
-          :rules="loginRules"
-          class="login-form"
-          @submit.prevent="handleLogin"
-        >
-          <el-form-item prop="username">
-            <el-input
-              v-model="loginForm.username"
-              placeholder="用户名"
-              size="large"
-              :prefix-icon="User"
-            />
-          </el-form-item>
-
-          <el-form-item prop="password">
-            <el-input
-              v-model="loginForm.password"
-              type="password"
-              placeholder="密码"
-              size="large"
-              :prefix-icon="Lock"
-              show-password
-            />
-          </el-form-item>
-
-          <div class="login-options">
-            <el-checkbox v-model="loginForm.remember">记住我</el-checkbox>
-            <el-link type="primary" class="forgot-password">忘记密码？</el-link>
+          <div class="login-header">
+            <p class="panel-tag">Sign In</p>
+            <h2>登录进入工作台</h2>
+            <p>输入账号信息后即可继续访问项目与学习内容。</p>
           </div>
 
-          <el-button
-            type="primary"
-            size="large"
-            class="login-button"
-            :loading="loading"
-            @click="handleLogin"
+          <el-form
+            ref="loginFormRef"
+            :model="loginForm"
+            :rules="loginRules"
+            class="login-form"
+            @submit.prevent="handleLogin"
           >
-            登录并进入工作台
-          </el-button>
+            <el-form-item prop="username">
+              <el-input
+                v-model="loginForm.username"
+                placeholder="用户名"
+                size="large"
+                :prefix-icon="User"
+              />
+            </el-form-item>
 
-          <div class="login-footer">
-            <div class="demo-account">
-              <span>演示账号</span>
-              <strong class="metric-mono">admin / admin123</strong>
+            <el-form-item prop="password">
+              <el-input
+                v-model="loginForm.password"
+                type="password"
+                placeholder="密码"
+                size="large"
+                :prefix-icon="Lock"
+                show-password
+              />
+            </el-form-item>
+
+            <div class="login-options">
+              <el-checkbox v-model="loginForm.remember">记住我</el-checkbox>
+              <el-link type="primary" class="forgot-password">忘记密码？</el-link>
             </div>
 
-            <div class="quick-login">
-              <span class="quick-login-label">快速登录</span>
-              <div class="quick-login-actions">
-                <button type="button" class="quick-login-chip" @click="quickLogin('admin')">管理员</button>
-                <button type="button" class="quick-login-chip" @click="quickLogin('user')">普通用户</button>
-                <button type="button" class="quick-login-chip" @click="quickLogin('guest')">访客</button>
+            <el-button
+              type="primary"
+              size="large"
+              class="login-button"
+              :loading="loading"
+              @click="handleLogin"
+            >
+              登录并进入工作台
+            </el-button>
+
+            <div class="login-footer">
+              <div class="demo-account">
+                <span>演示账号</span>
+                <strong class="metric-mono">admin / admin123</strong>
+              </div>
+
+              <div class="quick-login">
+                <span class="quick-login-label">快速登录</span>
+                <div class="quick-login-actions">
+                  <button type="button" class="quick-login-chip" @click="quickLogin('admin')">管理员</button>
+                  <button type="button" class="quick-login-chip" @click="quickLogin('user')">普通用户</button>
+                  <button type="button" class="quick-login-chip" @click="quickLogin('guest')">访客</button>
+                </div>
               </div>
             </div>
+          </el-form>
+        </div>
+
+        <div class="login-support">
+          <p class="login-support-label">登录后可继续</p>
+          <div class="login-support-grid">
+            <article class="support-item">
+              <strong>项目上下文</strong>
+              <p>继续上一次的项目推进节奏与任务状态。</p>
+            </article>
+            <article class="support-item">
+              <strong>学习路径</strong>
+              <p>从当前阶段恢复课程和知识地图浏览进度。</p>
+            </article>
           </div>
-        </el-form>
+        </div>
       </section>
     </div>
+    <footer class="login-page-footer">
+      © 2026 Agent Learning Platform Contributors · Licensed under the MIT License
+    </footer>
   </div>
 </template>
 
@@ -143,88 +139,28 @@ import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { User, Lock } from '@element-plus/icons-vue'
-import { ParticlesComponent as Particles } from 'particles.vue3'
-import { loadSlim } from '@tsparticles/slim'
-import { tsParticles } from '@tsparticles/engine'
 import type { FormInstance, FormRules } from 'element-plus'
 
-const platformMetrics = [
-  { label: '进行中项目', value: '06', detail: '当前冲刺保持稳定推进' },
-  { label: '学习进度', value: '72%', detail: 'LangChain 路线持续完成' },
-  { label: '社区反馈', value: '12', detail: '最新讨论可直接跟进' }
-]
-
-const workspaceFlow = [
-  { step: '01', title: 'Sprint Review', detail: '聚焦项目冲刺、风险点和当日优先级。' },
-  { step: '02', title: 'Learning Route', detail: '延续 LangChain 学习路径和阶段进度。' },
-  { step: '03', title: 'Deploy Check', detail: '统一查看实验、部署和社区反馈信号。' }
-]
-
-const previewSignals = [
-  { label: 'Run Count', value: '128' },
-  { label: 'Progress', value: '84%' },
-  { label: 'Active Tasks', value: '09' }
-]
-
-const particlesOptions = {
-  background: {
-    color: { value: 'transparent' }
+const orbitNodes = [
+  {
+    label: 'Project Pulse',
+    title: 'Sprint Stream',
+    detail: '把冲刺进度、任务风险和今日优先级收拢在同一层。',
+    className: 'is-project'
   },
-  fpsLimit: 60,
-  particles: {
-    number: {
-      value: 28,
-      density: {
-        enable: true,
-        area: 1100
-      }
-    },
-    color: {
-      value: ['#3b82f6', '#06b6d4', '#8b5cf6']
-    },
-    links: {
-      enable: true,
-      distance: 160,
-      color: '#3b82f6',
-      opacity: 0.06,
-      width: 1
-    },
-    opacity: {
-      value: { min: 0.06, max: 0.18 }
-    },
-    move: {
-      enable: true,
-      speed: 0.28,
-      random: true,
-      outModes: {
-        default: 'out'
-      }
-    },
-    size: {
-      value: { min: 1, max: 2.2 }
-    }
+  {
+    label: 'Learning Route',
+    title: 'Path Context',
+    detail: '学习路线会沿着当前阶段自动保持连续节奏。',
+    className: 'is-learning'
   },
-  interactivity: {
-    events: {
-      onHover: {
-        enable: true,
-        mode: 'grab'
-      },
-      resize: true
-    },
-    modes: {
-      grab: {
-        distance: 120,
-        links: {
-          opacity: 0.14
-        }
-      }
-    }
-  },
-  detectRetina: true
-}
-
-loadSlim(tsParticles)
+  {
+    label: 'Deploy Watch',
+    title: 'Release Signal',
+    detail: '部署检查、实验记录和反馈信号在这里同步更新。',
+    className: 'is-release'
+  }
+]
 
 const router = useRouter()
 const loginFormRef = ref<FormInstance>()
@@ -319,17 +255,9 @@ const quickLogin = (type: string) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: clamp(24px, 4vw, 40px);
+  padding: clamp(16px, 3vw, 28px);
   position: relative;
   overflow: hidden;
-}
-
-.particles-layer {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0.88;
 }
 
 .ambient-grid,
@@ -402,63 +330,33 @@ const quickLogin = (type: string) => {
 .login-shell {
   width: min(1120px, 100%);
   display: grid;
-  grid-template-columns: minmax(0, 0.76fr) minmax(420px, 520px);
-  gap: clamp(24px, 3vw, 40px);
-  align-items: center;
+  grid-template-columns: minmax(0, 1.1fr) minmax(360px, 420px);
+  gap: clamp(18px, 3vw, 32px);
+  align-items: stretch;
   position: relative;
   z-index: 1;
 }
 
+.login-page-footer {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(16px, 2.5vw, 24px);
+  transform: translateX(-50%);
+  width: min(calc(100% - 32px), 1120px);
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.6;
+  text-align: center;
+  z-index: 1;
+}
+
 .brand-panel {
-  display: grid;
-  gap: 24px;
-  padding: clamp(4px, 1.5vw, 12px);
-  opacity: 0.88;
-  transform: scale(0.985);
-}
-
-.brand-headline,
-.login-title,
-.login-subtitle,
-.brand-metrics,
-.workspace-preview,
-.card-glow-line,
-.login-header,
-.login-form {
-  opacity: 0;
-  animation: lift-in 780ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-}
-
-.brand-headline {
-  animation-delay: 80ms;
-}
-
-.login-title {
-  animation-delay: 140ms;
-}
-
-.login-subtitle {
-  animation-delay: 220ms;
-}
-
-.brand-metrics {
-  animation-delay: 300ms;
-}
-
-.workspace-preview {
-  animation-delay: 380ms;
-}
-
-.card-glow-line {
-  animation-delay: 180ms;
-}
-
-.login-header {
-  animation-delay: 240ms;
-}
-
-.login-form {
-  animation-delay: 320ms;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 18px;
+  padding: clamp(4px, 1vw, 12px);
 }
 
 .brand-headline {
@@ -506,6 +404,14 @@ const quickLogin = (type: string) => {
   gap: 6px;
 }
 
+.brand-caption {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
 .brand-status {
   color: var(--text-secondary);
   font-size: 13px;
@@ -514,10 +420,8 @@ const quickLogin = (type: string) => {
 .login-eyebrow,
 .feature-panel-label,
 .panel-tag,
-.metric-card p,
 .quick-login-label,
-.demo-account span,
-.preview-signal span {
+.demo-account span {
   margin: 0;
   color: var(--color-secondary);
   font-size: 11px;
@@ -527,8 +431,8 @@ const quickLogin = (type: string) => {
 
 .login-title {
   margin: 0;
-  font-size: clamp(42px, 7vw, 72px);
-  line-height: 0.96;
+  font-size: clamp(34px, 5.4vw, 58px);
+  line-height: 0.98;
   max-width: 10ch;
 }
 
@@ -536,262 +440,192 @@ const quickLogin = (type: string) => {
   margin: 0;
   max-width: 680px;
   color: var(--text-secondary);
-  font-size: 17px;
-  line-height: 1.8;
+  font-size: 15px;
+  line-height: 1.7;
 }
 
-.brand-metrics {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-}
-
-.metric-card,
 .login-card {
   @include section-shell;
 }
 
-.metric-card {
-  padding: 18px;
-  display: grid;
-  gap: 10px;
+.dynamic-stage {
+  flex: 0 0 auto;
   position: relative;
-  overflow: hidden;
-}
-
-.metric-card strong {
-  font-size: clamp(28px, 4vw, 36px);
-  line-height: 1;
-}
-
-.metric-card::after {
-  content: '';
-  position: absolute;
-  inset: auto -20% -55% auto;
-  width: 120px;
-  height: 120px;
-  border-radius: 999px;
-  background: radial-gradient(circle, rgba(59, 130, 246, 0.16), transparent 72%);
-}
-
-.metric-card span {
-  color: var(--text-secondary);
-  line-height: 1.6;
-}
-
-.workspace-preview {
-  position: relative;
-  min-height: 300px;
-  padding: 28px 18px 22px;
-}
-
-.preview-orbit {
-  position: absolute;
-  inset: 10px auto auto -6px;
-  width: 210px;
-  height: 210px;
-  pointer-events: none;
-  opacity: 0.78;
-}
-
-.orbit-ring {
-  position: absolute;
-  inset: 0;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.07);
-}
-
-.orbit-ring-outer {
-  animation: orbit-spin 18s linear infinite;
-}
-
-.orbit-ring-inner {
-  inset: 28px;
-  border-color: rgba(6, 182, 212, 0.16);
-  animation: orbit-spin-reverse 12s linear infinite;
-}
-
-.orbit-ring-outer::before,
-.orbit-ring-inner::before {
-  content: '';
-  position: absolute;
-  top: -4px;
-  left: 50%;
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  transform: translateX(-50%);
-  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
-  box-shadow: 0 0 18px rgba(59, 130, 246, 0.42);
-}
-
-.orbit-node {
-  position: absolute;
-  width: 12px;
-  height: 12px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.88);
-  box-shadow: 0 0 18px rgba(255, 255, 255, 0.4);
-}
-
-.orbit-node-one {
-  right: 24px;
-  top: 34px;
-  animation: node-pulse 3.8s ease-in-out infinite;
-}
-
-.orbit-node-two {
-  left: 34px;
-  bottom: 24px;
-  width: 9px;
-  height: 9px;
-  background: rgba(6, 182, 212, 0.9);
-  box-shadow: 0 0 18px rgba(6, 182, 212, 0.42);
-  animation: node-pulse 4.6s ease-in-out infinite;
-  animation-delay: -1.4s;
-}
-
-.preview-surface {
-  @include section-shell;
-  padding: 24px;
-  min-height: 272px;
-  position: relative;
-  overflow: hidden;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.03)),
-    rgba(255, 255, 255, 0.03);
-}
-
-.preview-surface::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(120deg, transparent 20%, rgba(255, 255, 255, 0.08) 48%, transparent 76%);
-  transform: translateX(-120%);
-  animation: surface-sheen 10s linear infinite;
-}
-
-.preview-surface::after {
-  content: '';
-  position: absolute;
-  inset: auto 0 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.4), transparent);
-}
-
-.preview-header {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  align-items: flex-start;
-}
-
-.preview-header strong {
-  display: block;
-  margin-top: 8px;
-  font-size: 20px;
-}
-
-.preview-badge {
-  padding: 8px 12px;
-  border-radius: 999px;
-  color: var(--text-primary);
-  font-size: 12px;
-  background: rgba(34, 197, 94, 0.14);
-  border: 1px solid rgba(34, 197, 94, 0.24);
-}
-
-.preview-flow {
-  margin-top: 24px;
-  display: grid;
-  gap: 14px;
-}
-
-.preview-flow-item {
-  @include panel-hover;
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 14px;
-  padding: 14px 16px;
-  border-radius: 18px;
+  min-height: 330px;
+  padding: 20px;
+  border-radius: 32px;
   border: 1px solid var(--line-soft);
-  background: rgba(255, 255, 255, 0.03);
+  background:
+    radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.12), transparent 28%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+  overflow: hidden;
 }
 
-.preview-flow-item:nth-child(1) {
-  animation: card-breathe 6s ease-in-out infinite;
+.dynamic-stage::before,
+.dynamic-stage::after {
+  content: '';
+  position: absolute;
+  inset: 50%;
+  width: 280px;
+  height: 280px;
+  border-radius: 999px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
 }
 
-.preview-flow-item:nth-child(2) {
-  animation: card-breathe 6s ease-in-out infinite;
-  animation-delay: -2s;
-}
-
-.preview-flow-item:nth-child(3) {
-  animation: card-breathe 6s ease-in-out infinite;
-  animation-delay: -4s;
-}
-
-.preview-step-index {
-  width: 44px;
-  height: 44px;
-  border-radius: 14px;
-  display: grid;
-  place-items: center;
-  color: var(--text-primary);
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.32), rgba(139, 92, 246, 0.28));
+.dynamic-stage::before {
   border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 0 0 36px rgba(255, 255, 255, 0.02),
+    0 0 0 88px rgba(255, 255, 255, 0.015);
+  animation: halo-rotate 22s linear infinite;
 }
 
-.preview-flow-item strong,
-.preview-flow-item p {
+.dynamic-stage::after {
+  background:
+    conic-gradient(
+      from 0deg,
+      rgba(59, 130, 246, 0.32),
+      rgba(6, 182, 212, 0.08),
+      rgba(139, 92, 246, 0.3),
+      rgba(59, 130, 246, 0.32)
+    );
+  filter: blur(28px);
+  opacity: 0.4;
+  animation: halo-rotate 18s linear infinite reverse;
+}
+
+.stage-grid {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.18;
+  background-image:
+    linear-gradient(var(--hero-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--hero-grid) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: radial-gradient(circle at center, black 38%, transparent 82%);
+}
+
+.stage-core {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  z-index: 4;
+  transform: translate(-50%, -50%);
+  width: min(288px, calc(100% - 48px));
+  padding: 20px 18px;
+  text-align: center;
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(15, 23, 42, 0.42);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 24px 60px rgba(6, 9, 16, 0.32);
+}
+
+.stage-core strong,
+.stage-core p {
+  display: block;
   margin: 0;
 }
 
-.preview-flow-item p {
-  margin-top: 6px;
+.stage-core strong {
+  margin-top: 8px;
+  font-size: clamp(20px, 3vw, 28px);
+  line-height: 1.15;
+}
+
+.stage-core p:last-child {
+  margin-top: 8px;
   color: var(--text-secondary);
   line-height: 1.6;
+  font-size: 14px;
 }
 
-.preview-footer {
-  margin-top: 18px;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
+.orbit-node {
+  --orbit-transform: translate3d(0, 0, 0);
+  position: absolute;
+  z-index: 2;
+  width: min(196px, 44%);
+  padding: 12px 14px;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(15, 23, 42, 0.34);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 20px 44px rgba(6, 9, 16, 0.22);
+  animation: node-float 9s ease-in-out infinite;
+  transition:
+    z-index 0s linear 0s,
+    box-shadow var(--transition-base),
+    border-color var(--transition-base),
+    background var(--transition-base);
 }
 
-.preview-signal {
-  @include panel-hover;
-  padding: 14px;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--line-soft);
-  display: grid;
-  gap: 8px;
+.orbit-node:hover {
+  z-index: 8;
+  border-color: rgba(96, 165, 250, 0.34);
+  background: rgba(15, 23, 42, 0.56);
+  box-shadow:
+    0 0 0 1px rgba(59, 130, 246, 0.24),
+    0 28px 56px rgba(6, 9, 16, 0.34);
 }
 
-.preview-signal:nth-child(2) {
-  animation: signal-glow 5.5s ease-in-out infinite;
+.orbit-node span,
+.orbit-node strong,
+.orbit-node p {
+  display: block;
+  margin: 0;
 }
 
-.preview-signal strong {
-  font-size: 18px;
+.orbit-node span {
+  color: var(--color-secondary);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.orbit-node strong {
+  margin-top: 6px;
+  font-size: 15px;
+}
+
+.orbit-node p {
+  margin-top: 6px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  font-size: 13px;
+}
+
+.orbit-node.is-project {
+  top: 18px;
+  left: 18px;
+}
+
+.orbit-node.is-learning {
+  top: 32px;
+  right: 18px;
+  animation-delay: -3s;
+}
+
+.orbit-node.is-release {
+  left: 50%;
+  bottom: 18px;
+  --orbit-transform: translateX(-50%);
+  animation-delay: -5s;
 }
 
 .login-card {
-  padding: clamp(28px, 4vw, 36px);
+  height: 100%;
+  padding: clamp(22px, 3vw, 28px);
   background: rgba(255, 255, 255, 0.06);
   border-radius: var(--radius-xl);
   position: relative;
   overflow: hidden;
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.08),
-    0 28px 80px rgba(6, 9, 16, 0.42),
-    0 0 0 12px rgba(59, 130, 246, 0.04);
-  transform: translateY(-2px) scale(1.01);
-  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 18px;
 }
 
 .login-card::before {
@@ -804,40 +638,37 @@ const quickLogin = (type: string) => {
   pointer-events: none;
 }
 
-.login-card::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  pointer-events: none;
-}
-
 .card-glow-line {
   width: 120px;
   height: 4px;
   border-radius: 999px;
-  margin-bottom: 22px;
+  margin-bottom: 16px;
   background: linear-gradient(90deg, var(--color-primary), var(--color-secondary), var(--color-accent));
   box-shadow: 0 0 26px rgba(59, 130, 246, 0.3);
 }
 
+.login-card-body {
+  display: grid;
+  gap: 0;
+}
+
 .login-header {
   display: grid;
-  gap: 10px;
-  margin-bottom: 24px;
+  gap: 8px;
+  margin-bottom: 18px;
 }
 
 .login-header h2 {
   margin: 0;
-  font-size: clamp(28px, 4vw, 36px);
+  font-size: clamp(24px, 3.2vw, 30px);
   color: var(--text-primary);
 }
 
 .login-header p:last-child {
   margin: 0;
   color: var(--text-secondary);
-  line-height: 1.7;
+  line-height: 1.6;
+  font-size: 14px;
 }
 
 .login-form {
@@ -846,11 +677,11 @@ const quickLogin = (type: string) => {
 }
 
 .login-form :deep(.el-form-item) {
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .login-form :deep(.el-input__wrapper) {
-  min-height: 50px;
+  min-height: 46px;
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.04);
   box-shadow: inset 0 0 0 1px var(--line-soft);
@@ -892,26 +723,21 @@ const quickLogin = (type: string) => {
 
 .login-button {
   width: 100%;
-  min-height: 56px;
-  margin-top: 8px;
+  min-height: 46px;
+  margin-top: 2px;
   border: none;
   border-radius: 14px;
-  font-size: 16px;
-  font-weight: 800;
-  letter-spacing: 0.02em;
+  font-size: 14px;
+  font-weight: 700;
   background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
-  box-shadow:
-    0 20px 44px rgba(59, 130, 246, 0.28),
-    0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+  box-shadow: 0 18px 40px rgba(59, 130, 246, 0.22);
   position: relative;
   overflow: hidden;
 }
 
 .login-button:hover {
-  transform: translateY(-2px);
-  box-shadow:
-    0 24px 52px rgba(59, 130, 246, 0.34),
-    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+  transform: translateY(-1px);
+  box-shadow: 0 22px 42px rgba(59, 130, 246, 0.28);
 }
 
 .login-button::after {
@@ -924,11 +750,11 @@ const quickLogin = (type: string) => {
 }
 
 .login-footer {
-  margin-top: 22px;
-  padding-top: 22px;
+  margin-top: 16px;
+  padding-top: 16px;
   border-top: 1px solid var(--line-soft);
   display: grid;
-  gap: 18px;
+  gap: 14px;
 }
 
 .demo-account {
@@ -938,30 +764,76 @@ const quickLogin = (type: string) => {
 
 .demo-account strong {
   color: var(--text-primary);
-  font-size: 15px;
+  font-size: 14px;
 }
 
 .quick-login {
   display: grid;
-  gap: 12px;
+  gap: 10px;
 }
 
 .quick-login-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
 }
 
 .quick-login-chip {
   @include panel-hover;
   display: inline-flex;
   align-items: center;
-  padding: 10px 14px;
+  padding: 8px 12px;
   border-radius: 999px;
   border: 1px solid var(--line-soft);
   background: rgba(255, 255, 255, 0.04);
   color: var(--text-primary);
   cursor: pointer;
+  font-size: 13px;
+}
+
+.login-support {
+  position: relative;
+  z-index: 1;
+  padding-top: 16px;
+  border-top: 1px solid var(--line-soft);
+}
+
+.login-support-label {
+  margin: 0 0 10px;
+  color: var(--color-secondary);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.login-support-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.support-item {
+  padding: 12px 14px;
+  border-radius: 18px;
+  border: 1px solid var(--line-soft);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.support-item strong,
+.support-item p {
+  margin: 0;
+}
+
+.support-item strong {
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.support-item p {
+  margin-top: 6px;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  font-size: 13px;
 }
 
 @keyframes ambient-drift {
@@ -972,18 +844,6 @@ const quickLogin = (type: string) => {
 
   50% {
     transform: translate3d(18px, -14px, 0) scale(1.06);
-  }
-}
-
-@keyframes lift-in {
-  from {
-    opacity: 0;
-    transform: translateY(26px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
   }
 }
 
@@ -1002,70 +862,24 @@ const quickLogin = (type: string) => {
   }
 }
 
-@keyframes orbit-spin {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes orbit-spin-reverse {
-  from {
-    transform: rotate(360deg);
-  }
-
-  to {
-    transform: rotate(0deg);
-  }
-}
-
-@keyframes node-pulse {
-  0%,
-  100% {
-    transform: scale(1);
-    opacity: 0.8;
-  }
-
-  50% {
-    transform: scale(1.22);
-    opacity: 1;
-  }
-}
-
-@keyframes surface-sheen {
+@keyframes halo-rotate {
   0% {
-    transform: translateX(-140%);
+    transform: translate(-50%, -50%) rotate(0deg);
   }
 
   100% {
-    transform: translateX(140%);
+    transform: translate(-50%, -50%) rotate(360deg);
   }
 }
 
-@keyframes card-breathe {
+@keyframes node-float {
   0%,
   100% {
-    transform: translateY(0);
+    transform: var(--orbit-transform) translateY(0);
   }
 
   50% {
-    transform: translateY(-3px);
-  }
-}
-
-@keyframes signal-glow {
-  0%,
-  100% {
-    box-shadow: none;
-    border-color: var(--line-soft);
-  }
-
-  50% {
-    box-shadow: 0 0 0 1px rgba(6, 182, 212, 0.14), 0 14px 32px rgba(6, 182, 212, 0.08);
-    border-color: rgba(6, 182, 212, 0.24);
+    transform: var(--orbit-transform) translateY(-8px);
   }
 }
 
@@ -1089,60 +903,63 @@ const quickLogin = (type: string) => {
 
   .brand-panel {
     padding: 0;
-    opacity: 1;
-    transform: none;
+    justify-content: flex-start;
   }
 
   .login-title {
     max-width: none;
   }
 
-  .workspace-preview {
-    padding-inline: 0;
-  }
-
   .ambient-orb {
     width: 320px;
     height: 320px;
-  }
-
-  .preview-orbit {
-    inset: 8px auto auto 0;
-    width: 170px;
-    height: 170px;
   }
 }
 
 @media (max-width: 640px) {
   .login-container {
-    padding: 18px;
-  }
-
-  .brand-metrics {
-    grid-template-columns: 1fr;
-  }
-
-  .login-shell {
-    grid-template-columns: 1fr;
+    padding: 18px 18px 56px;
   }
 
   .login-card {
     min-width: 0;
-    transform: none;
   }
 
-  .brand-headline,
-  .preview-header {
+  .brand-headline {
     align-items: flex-start;
-    flex-direction: column;
   }
 
-  .preview-footer {
-    grid-template-columns: 1fr;
+  .dynamic-stage {
+    min-height: 460px;
+    padding: 20px;
   }
 
-  .preview-orbit {
-    display: none;
+  .stage-core {
+    position: relative;
+    inset: auto;
+    transform: none;
+    width: 100%;
+    margin-top: 150px;
+  }
+
+  .orbit-node {
+    width: calc(100% - 24px);
+  }
+
+  .orbit-node.is-project {
+    top: 18px;
+    left: 12px;
+  }
+
+  .orbit-node.is-learning {
+    top: 114px;
+    right: 12px;
+  }
+
+  .orbit-node.is-release {
+    left: 12px;
+    bottom: 18px;
+    --orbit-transform: translate3d(0, 0, 0);
   }
 
   .login-options {
@@ -1158,28 +975,23 @@ const quickLogin = (type: string) => {
     flex: 1 1 calc(50% - 10px);
     justify-content: center;
   }
+
+  .login-support-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .login-page-footer {
+    width: calc(100% - 36px);
+    bottom: 16px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .brand-headline,
-  .login-title,
-  .login-subtitle,
-  .brand-metrics,
-  .workspace-preview,
-  .card-glow-line,
-  .login-header,
-  .login-form {
-    opacity: 1;
-    animation: none;
-  }
-
   .ambient-orb,
   .brand-mark,
-  .orbit-ring,
+  .dynamic-stage::before,
+  .dynamic-stage::after,
   .orbit-node,
-  .preview-surface::before,
-  .preview-flow-item,
-  .preview-signal,
   .login-button::after {
     animation: none;
   }
