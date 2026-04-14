@@ -21,6 +21,7 @@ const showHeader = computed(() => !['Login', 'NotFound'].includes(String(route.n
 
 onMounted(() => {
   appStore.initialize()
+  // 测试
 })
 </script>
 
