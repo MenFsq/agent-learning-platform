@@ -221,6 +221,7 @@ onBeforeUnmount(() => {
 .header-left {
   gap: 28px;
   min-width: 0;
+  flex: 1 1 auto;
 }
 
 .header-right {
@@ -282,6 +283,7 @@ onBeforeUnmount(() => {
   gap: 6px;
   padding: 8px;
   border-radius: 999px;
+  min-width: 0;
 }
 
 [data-theme='light'] .main-nav {
@@ -295,6 +297,7 @@ onBeforeUnmount(() => {
   padding: 10px 14px;
   border-radius: 999px;
   color: var(--text-secondary);
+  flex: 0 0 auto;
   transition:
     color var(--transition-fast),
     background var(--transition-fast),
@@ -499,6 +502,14 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width: 720px) {
+  .header-shell {
+    gap: 10px;
+  }
+
+  .header-left {
+    gap: 10px;
+  }
+
   .brand-copy small,
   .brand-copy strong {
     display: none;
@@ -506,10 +517,61 @@ onBeforeUnmount(() => {
 
   .main-nav {
     gap: 2px;
+    flex: 1 1 auto;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding-inline: 4px;
+  }
+
+  .main-nav::-webkit-scrollbar {
+    display: none;
   }
 
   .nav-item {
     padding: 10px;
+  }
+
+  .header-right {
+    gap: 8px;
+  }
+
+  .profile-button {
+    padding-inline: 6px;
+  }
+
+  .profile-arrow {
+    display: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .header-shell {
+    gap: 8px;
+  }
+
+  .header-left {
+    gap: 8px;
+  }
+
+  .brand-mark {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+  }
+
+  .icon-button,
+  .profile-button {
+    min-height: 38px;
+  }
+
+  .icon-button {
+    width: 38px;
+  }
+
+  .profile-button {
+    padding: 2px;
   }
 }
 </style>

@@ -88,11 +88,16 @@
 
       <section class="login-card">
         <div class="card-glow-line"></div>
+        <div class="login-focus-banner">
+          <span class="focus-dot"></span>
+          <strong>主入口</strong>
+          <p>在这里输入账号后，点击主按钮即可进入工作台。</p>
+        </div>
 
         <div class="login-header">
-          <p class="panel-tag">Welcome Back</p>
-          <h2>登录账号</h2>
-          <p>继续你的学习与项目协作进度。</p>
+          <p class="panel-tag">Sign In</p>
+          <h2>登录进入工作台</h2>
+          <p>先完成登录，再继续你的项目、学习与协作上下文。</p>
         </div>
 
         <div class="login-badges">
@@ -116,6 +121,11 @@
           class="login-form"
           @submit.prevent="handleLogin"
         >
+          <div class="primary-action-guide">
+            <span>请先填写账号信息</span>
+            <strong>然后点击下方“登录并进入工作台”</strong>
+          </div>
+
           <el-form-item prop="username">
             <el-input
               v-model="loginForm.username"
@@ -456,7 +466,7 @@ const quickLogin = (type: string) => {
 .login-shell {
   width: min(1160px, 100%);
   display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(360px, 420px);
+  grid-template-columns: minmax(0, 0.9fr) minmax(420px, 500px);
   gap: clamp(24px, 4vw, 48px);
   align-items: center;
   position: relative;
@@ -467,6 +477,8 @@ const quickLogin = (type: string) => {
   display: grid;
   gap: 28px;
   padding: clamp(8px, 2vw, 20px);
+  opacity: 0.88;
+  transform: scale(0.985);
 }
 
 .brand-headline,
@@ -930,6 +942,12 @@ const quickLogin = (type: string) => {
   border-radius: var(--radius-xl);
   position: relative;
   overflow: hidden;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 28px 80px rgba(6, 9, 16, 0.42),
+    0 0 0 12px rgba(59, 130, 246, 0.04);
+  transform: translateY(-2px) scale(1.01);
+  z-index: 2;
 }
 
 .login-card::before {
@@ -942,6 +960,15 @@ const quickLogin = (type: string) => {
   pointer-events: none;
 }
 
+.login-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  pointer-events: none;
+}
+
 .card-glow-line {
   width: 120px;
   height: 4px;
@@ -949,6 +976,42 @@ const quickLogin = (type: string) => {
   margin-bottom: 22px;
   background: linear-gradient(90deg, var(--color-primary), var(--color-secondary), var(--color-accent));
   box-shadow: 0 0 26px rgba(59, 130, 246, 0.3);
+}
+
+.login-focus-banner {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: center;
+  gap: 10px 12px;
+  margin-bottom: 18px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(139, 92, 246, 0.06));
+}
+
+.focus-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--color-secondary), var(--color-primary));
+  box-shadow: 0 0 16px rgba(59, 130, 246, 0.42);
+}
+
+.login-focus-banner strong,
+.login-focus-banner p {
+  margin: 0;
+}
+
+.login-focus-banner strong {
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.login-focus-banner p {
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.6;
 }
 
 .login-header {
@@ -1064,6 +1127,31 @@ const quickLogin = (type: string) => {
   gap: 8px;
 }
 
+.primary-action-guide {
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  display: grid;
+  gap: 4px;
+}
+
+.primary-action-guide span,
+.primary-action-guide strong {
+  margin: 0;
+}
+
+.primary-action-guide span {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.primary-action-guide strong {
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
 .login-form :deep(.el-form-item) {
   margin-bottom: 12px;
 }
@@ -1111,21 +1199,26 @@ const quickLogin = (type: string) => {
 
 .login-button {
   width: 100%;
-  min-height: 50px;
-  margin-top: 4px;
+  min-height: 56px;
+  margin-top: 8px;
   border: none;
   border-radius: 14px;
-  font-size: 15px;
-  font-weight: 700;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
   background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
-  box-shadow: 0 18px 40px rgba(59, 130, 246, 0.22);
+  box-shadow:
+    0 20px 44px rgba(59, 130, 246, 0.28),
+    0 0 0 1px rgba(255, 255, 255, 0.08) inset;
   position: relative;
   overflow: hidden;
 }
 
 .login-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 22px 42px rgba(59, 130, 246, 0.28);
+  transform: translateY(-2px);
+  box-shadow:
+    0 24px 52px rgba(59, 130, 246, 0.34),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
 }
 
 .login-button::after {
@@ -1327,6 +1420,8 @@ const quickLogin = (type: string) => {
 
   .brand-panel {
     padding: 0;
+    opacity: 1;
+    transform: none;
   }
 
   .login-title {
@@ -1368,6 +1463,7 @@ const quickLogin = (type: string) => {
 
   .login-card {
     min-width: 0;
+    transform: none;
   }
 
   .brand-headline,
