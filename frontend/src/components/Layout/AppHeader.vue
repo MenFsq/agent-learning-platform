@@ -46,7 +46,7 @@
           <MoonStar v-else class="icon" />
         </button>
 
-        <el-dropdown trigger="click" placement="bottom-end">
+        <el-dropdown trigger="click" placement="bottom-end" popper-class="header-dropdown-popper">
           <button type="button" class="icon-button">
             <el-badge :value="unreadCount" :hidden="unreadCount === 0" :max="99">
               <Bell class="icon" />
@@ -71,7 +71,7 @@
           </template>
         </el-dropdown>
 
-        <el-dropdown trigger="click" placement="bottom-end">
+        <el-dropdown trigger="click" placement="bottom-end" popper-class="header-dropdown-popper">
           <button type="button" class="profile-button">
             <el-avatar :size="34" :src="user.avatar" />
             <div class="profile-copy">
@@ -426,9 +426,38 @@ onBeforeUnmount(() => {
   background: transparent;
 }
 
-.menu-item {
+:deep(.menu-panel .el-dropdown-menu__item) {
   border-radius: 12px;
   color: var(--text-secondary);
+  transition:
+    color var(--transition-fast),
+    background-color var(--transition-fast);
+}
+
+:deep(.menu-panel .el-dropdown-menu__item:hover),
+:deep(.menu-panel .el-dropdown-menu__item:focus) {
+  background: rgba(59, 130, 246, 0.14);
+  color: var(--text-primary);
+}
+
+[data-theme='light'] :deep(.menu-panel .el-dropdown-menu__item:hover),
+[data-theme='light'] :deep(.menu-panel .el-dropdown-menu__item:focus) {
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--text-primary);
+}
+
+:deep(.header-dropdown-popper .el-dropdown-menu__item:hover),
+:deep(.header-dropdown-popper .el-dropdown-menu__item:focus),
+:deep(.header-dropdown-popper .el-dropdown-menu__item:not(.is-disabled):hover) {
+  background-color: rgba(59, 130, 246, 0.14) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-theme='light'] :deep(.header-dropdown-popper .el-dropdown-menu__item:hover),
+[data-theme='light'] :deep(.header-dropdown-popper .el-dropdown-menu__item:focus),
+[data-theme='light'] :deep(.header-dropdown-popper .el-dropdown-menu__item:not(.is-disabled):hover) {
+  background-color: rgba(59, 130, 246, 0.1) !important;
+  color: var(--text-primary) !important;
 }
 
 .notice-item {
@@ -575,5 +604,24 @@ onBeforeUnmount(() => {
   .profile-button {
     padding: 2px;
   }
+}
+</style>
+
+<style lang="scss">
+.header-dropdown-popper {
+  --el-dropdown-menuItem-hover-fill: rgba(59, 130, 246, 0.14);
+  --el-dropdown-menuItem-hover-color: var(--text-primary);
+}
+
+[data-theme='light'] .header-dropdown-popper {
+  --el-dropdown-menuItem-hover-fill: rgba(59, 130, 246, 0.1);
+  --el-dropdown-menuItem-hover-color: var(--text-primary);
+}
+
+.header-dropdown-popper .el-dropdown-menu__item:not(.is-disabled):hover,
+.header-dropdown-popper .el-dropdown-menu__item:focus,
+.header-dropdown-popper .el-dropdown-menu__item.hover {
+  background-color: var(--el-dropdown-menuItem-hover-fill) !important;
+  color: var(--el-dropdown-menuItem-hover-color) !important;
 }
 </style>
