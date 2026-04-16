@@ -1,247 +1,169 @@
-# Agent Learning Platform - 前后端分离架构
+# Agent Learning Platform Architecture
 
-## 🏗️ 架构概述
+## 架构说明
 
-本项目采用现代化的前后端分离架构，前端使用 Vue 3 + TypeScript，后端使用 FastAPI + LangChain。
+这份文档只回答两个问题：
 
-### **前端 (Frontend)**
-- **技术栈**: Vue 3 + TypeScript + Vite + Pinia + Element Plus
-- **开发服务器**: `localhost:5173`
-- **构建工具**: Vite
-- **状态管理**: Pinia
-- **UI框架**: Element Plus
+1. 当前仓库实际上已经实现了什么。
+2. 目标中的 `LangChain Agent` 集成应该怎么接进现有工程。
 
-### **后端 (Backend)**
-- **技术栈**: FastAPI + LangChain + OpenClaw SDK + PostgreSQL
-- **开发服务器**: `localhost:8000`
-- **API文档**: Swagger UI (`/docs`)
-- **数据库**: PostgreSQL + SQLAlchemy
-- **AI集成**: LangChain + OpenClaw
+之前文档里把不少“计划中的 AI 能力”写成了“现有架构的一部分”，这会误导阅读者。这里按代码现状重新描述。
 
-## 📁 目录结构
+## 当前实际架构
 
-```
-agent-learning-platform/
-├── 📁 frontend/                    # 前端项目
-│   ├── 📁 src/                    # 源代码
-│   │   ├── 📁 components/         # Vue组件
-│   │   ├── 📁 views/             # 页面组件
-│   │   ├── 📁 composables/       # 组合式函数
-│   │   ├── 📁 stores/            # Pinia状态管理
-│   │   ├── 📁 types/             # TypeScript类型
-│   │   ├── 📁 utils/             # 工具函数
-│   │   ├── 📁 assets/            # 静态资源
-│   │   ├── App.vue               # 根组件
-│   │   └── main.ts               # 入口文件
-│   ├── index.html                # HTML模板
-│   ├── package.json              # 依赖配置
-│   ├── vite.config.ts            # Vite配置
-│   ├── tsconfig.json             # TypeScript配置
-│   └── README.md                 # 前端文档
-│
-├── 📁 backend/                    # 后端项目
-│   ├── 📁 src/                   # 源代码
-│   │   ├── 📁 api/              # API路由
-│   │   ├── 📁 core/             # 核心逻辑
-│   │   ├── 📁 models/           # 数据模型
-│   │   ├── 📁 services/         # 业务服务
-│   │   ├── 📁 utils/            # 工具函数
-│   │   ├── 📁 middleware/       # 中间件
-│   │   ├── main.py              # 应用入口
-│   │   └── config.py            # 配置管理
-│   ├── requirements.txt          # Python依赖
-│   ├── Dockerfile               # Docker配置
-│   ├── alembic.ini              # 数据库迁移配置
-│   └── README.md                # 后端文档
-│
-├── 📁 docs/                      # 项目文档
-├── 📁 scripts/                   # 自动化脚本
-├── 📁 docker/                    # Docker配置
-├── 📄 README.md                  # 项目总览
-├── 📄 ARCHITECTURE.md            # 架构说明
-├── 📄 .gitignore                 # Git忽略配置
-└── 📄 docker-compose.yml         # Docker编排
-```
+### 前端
 
-## 🔧 开发环境设置
+前端目前是一个以工作台为核心的 `Vue 3` 单页应用，主要承担展示和交互职责。
 
-### **前端开发**
-```bash
-cd frontend
-npm install          # 安装依赖
-npm run dev          # 启动开发服务器
+- 技术栈：`Vue 3` + `TypeScript` + `Vite` + `Pinia` + `Element Plus`
+- 已有页面：仪表板、学习页、登录页、项目页/社区页/设置页占位
+- 当前重点：学习内容展示、工作台导航、视觉系统、知识地图交互
+
+前端里和 `LangChain` 最相关的部分，当前主要还是“学习内容与知识地图”，不是 Agent 运行能力本身。
+
+### 后端
+
+后端目前是一个 `FastAPI` 应用骨架，已经具备一些通用工程基础：
+
+- 应用入口与生命周期管理
+- 路由注册
+- CORS / 日志 / 认证中间件
+- 数据库初始化与健康检查
+- 认证、项目、学习等 API 模块
+
+但要注意，现有很多后端接口仍然偏“骨架态”或“模拟态”：
+
+- 认证模块里有多处模拟返回
+- 项目模块主要基于内存数据
+- AI 相关能力并没有形成独立的后端服务层
+
+### 数据与基础设施
+
+当前基础设施设计倾向于：
+
+- 数据库：`PostgreSQL` + `SQLAlchemy`
+- 认证：`JWT`
+- 缓存：预留 `Redis`
+- AI 依赖：`langchain`、`openai`、`openclaw-sdk`
+
+这里的重点是“依赖和方向已经声明”，不等于“功能已经完成”。
+
+## 当前仓库中已经存在的能力边界
+
+可以把当前代码理解成下面这套结构：
+
+```text
+Frontend UI
+  -> 展示仪表板、学习工作台、导航和基础交互
+
+Backend API
+  -> 提供认证、项目、学习等基础接口
+
+Data Layer
+  -> 数据库配置、模型、基础持久化准备
+
+AI Layer
+  -> 目前仅有依赖声明和文案预留，尚未形成真实执行链
 ```
 
-### **后端开发**
-```bash
-cd backend
-python -m venv venv  # 创建虚拟环境
-venv\Scripts\activate # 激活虚拟环境
-pip install -r requirements.txt  # 安装依赖
-uvicorn src.main:app --reload    # 启动开发服务器
+也就是说，项目现在最强的是“前端工作台 + 后端基础骨架”，最缺的是“真实 Agent 能力层”。
+
+## 目标 Agent 架构
+
+项目后续如果要真正完成 `LangChain Agent` 集成，建议采用下面这条分层：
+
+```text
+Frontend
+  -> Agent Chat / Task UI / Run Status / Result View
+
+API Layer (FastAPI)
+  -> 请求入口、鉴权、参数校验、会话管理
+
+Agent Application Layer
+  -> AgentService / SessionService / RunService
+
+LangChain Orchestration Layer
+  -> Prompt / Tools / Memory / Agent Executor / Callbacks
+
+Integration Layer
+  -> LLM Provider / Vector Store / External APIs / Business Tools
+
+Persistence Layer
+  -> User / Session / Message / Run / Feedback / Evaluation
 ```
 
-## 🌐 API接口设计
+## 推荐的后端模块拆分
 
-### **认证相关**
-- `POST /api/auth/login` - 用户登录
-- `POST /api/auth/register` - 用户注册
-- `GET /api/auth/profile` - 获取用户信息
+为了避免把 Agent 逻辑堆在路由文件里，后端建议新增类似结构：
 
-### **项目相关**
-- `GET /api/projects` - 获取项目列表
-- `POST /api/projects` - 创建项目
-- `GET /api/projects/{id}` - 获取项目详情
-- `PUT /api/projects/{id}` - 更新项目
-- `DELETE /api/projects/{id}` - 删除项目
-
-### **学习相关**
-- `GET /api/learning-paths` - 获取学习路径
-- `GET /api/tutorials` - 获取教程列表
-- `POST /api/progress` - 更新学习进度
-
-### **AI相关**
-- `POST /api/ai/chat` - AI对话接口
-- `POST /api/ai/code-review` - 代码审查
-- `POST /api/ai/generate-example` - 生成代码示例
-
-## 🐳 部署方案
-
-### **开发环境**
-```yaml
-# docker-compose.dev.yml
-version: '3.8'
-services:
-  frontend:
-    build: ./frontend
-    ports:
-      - "5173:5173"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-  
-  backend:
-    build: ./backend
-    ports:
-      - "8000:8000"
-    volumes:
-      - ./backend:/app
-    environment:
-      - DATABASE_URL=postgresql://user:password@db:5432/agent_platform
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - OPENCLAW_API_KEY=${OPENCLAW_API_KEY}
-  
-  db:
-    image: postgres:15
-    environment:
-      - POSTGRES_USER=user
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=agent_platform
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-
-volumes:
-  postgres_data:
+```text
+backend/src/
+├── agent/
+│   ├── prompts/
+│   ├── tools/
+│   ├── memory/
+│   ├── chains/
+│   ├── executors/
+│   └── callbacks/
+├── services/
+│   ├── agent_service.py
+│   ├── chat_service.py
+│   └── session_service.py
+└── api/v1/
+    └── agent.py
 ```
 
-### **生产环境**
-```yaml
-# docker-compose.prod.yml
-version: '3.8'
-services:
-  nginx:
-    image: nginx:alpine
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./nginx/ssl:/etc/nginx/ssl
-      - ./frontend/dist:/usr/share/nginx/html
-  
-  backend:
-    build: ./backend
-    restart: always
-    environment:
-      - DATABASE_URL=postgresql://user:password@db:5432/agent_platform
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - OPENCLAW_API_KEY=${OPENCLAW_API_KEY}
-  
-  db:
-    image: postgres:15
-    restart: always
-    environment:
-      - POSTGRES_USER=user
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=agent_platform
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+各层职责建议如下：
 
-volumes:
-  postgres_data:
-```
+- `api/v1/agent.py`：只处理 HTTP 输入输出，不写复杂业务逻辑
+- `services/agent_service.py`：负责编排一次 Agent 调用流程
+- `agent/prompts/`：维护系统提示词与任务模板
+- `agent/tools/`：封装数据库查询、检索、外部 API、业务工具
+- `agent/memory/`：管理会话历史和上下文裁剪
+- `agent/callbacks/`：记录日志、trace、tokens、错误信息
 
-## 🔄 开发工作流
+## 第一阶段最小可运行链路
 
-1. **前端开发**
-   - 在 `frontend/` 目录中开发
-   - 使用 Vite 热重载
-   - 通过代理连接到后端 API
+在当前项目阶段，不建议一开始就做很重的多 Agent 架构。更合理的是先打通一个最小闭环：
 
-2. **后端开发**
-   - 在 `backend/` 目录中开发
-   - 使用 FastAPI 自动生成 API 文档
-   - 使用 Alembic 管理数据库迁移
+1. 前端提交一个用户问题
+2. 后端 `/api/v1/agent/chat` 接收请求
+3. `AgentService` 组装 prompt 和可用 tools
+4. `LangChain` 执行单 Agent 调用
+5. 返回文本结果、工具调用记录和耗时
+6. 将会话与执行记录落库
 
-3. **API集成**
-   - 前端通过 `axios` 调用后端 API
-   - 使用环境变量配置 API 地址
-   - 统一的错误处理
+只要这条链路真实可运行，项目就从“有 AI 方向”进入“有 AI 主能力”。
 
-## 📊 监控与日志
+## 后续演进路线
 
-### **前端监控**
-- 使用 Vue DevTools 调试
-- 错误边界处理
-- 性能监控
+### 阶段 1：单 Agent 可运行
 
-### **后端监控**
-- FastAPI 内置日志
-- 结构化日志输出
-- 性能指标收集
+- 支持单轮/多轮对话
+- 接入基础模型
+- 至少实现 1 到 2 个真实 tools
+- 保存会话和运行日志
 
-## 🔐 安全考虑
+### 阶段 2：Agent 工程化
 
-1. **认证授权**
-   - JWT Token 认证
-   - 角色权限控制
-   - API 访问限制
+- 流式输出
+- 可观测性和 trace
+- Prompt 版本管理
+- 失败重试和限流
 
-2. **数据安全**
-   - SQL 注入防护
-   - XSS 防护
-   - CSRF 防护
+### 阶段 3：更复杂的 Agent 能力
 
-3. **API安全**
-   - 请求速率限制
-   - 输入验证
-   - 输出过滤
+- RAG
+- 多步骤任务执行
+- 多 Agent 协作
+- 评估与反馈闭环
 
-## 🚀 性能优化
+## 当前架构结论
 
-### **前端优化**
-- 代码分割
-- 懒加载路由
-- 图片优化
-- 缓存策略
+当前仓库适合被描述为：
 
-### **后端优化**
-- 数据库连接池
-- 查询优化
-- 缓存机制
-- 异步处理
+- 一个已经完成前后端基础搭建的 Agent 平台雏形
+- 一个已有较完整 `LangChain` 学习内容呈现的前端工作台
+- 一个尚未真正接入 `LangChain Agent` 执行链的后端工程骨架
 
----
-
-**最后更新**: 2026-04-13  
-**架构师**: 小老虎 🐯
+因此，后续架构工作的重心应放在 AI 能力层落地，而不是继续扩充“看起来很完整”的说明文档。
