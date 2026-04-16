@@ -119,7 +119,8 @@ import {
   SunMedium,
   UserRound,
   Users,
-  FileCode
+  FileCode,
+  Bot
 } from 'lucide-vue-next'
 import { storeToRefs } from 'pinia'
 
@@ -141,6 +142,7 @@ const user = reactive({
 const navItems = [
   { path: '/', name: '仪表板', icon: LayoutDashboard },
   { path: '/projects', name: '项目', icon: FolderKanban },
+  { path: '/agent', name: 'Agent', icon: Bot },
   { path: '/learning', name: '学习', icon: BookOpen },
   { path: '/community', name: '社区', icon: Users },
   { path: '/api-docs', name: 'API文档', icon: FileCode },

@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试 Community 页面</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .status {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 20px;
+            border-radius: 15px;
+        }
+        
+        .status-item {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .status-label {
+            display: block;
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+        
+        .status-value {
+            display: block;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        
+        .status-value.online {
+            color: #4ade80;
+        }
+        
+        .status-value.offline {
+            color: #f87171;
+        }
+        
+        .links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .link-card {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            padding: 25px;
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .link-card:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .link-card h3 {
+            margin: 0 0 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .link-card p {
+            margin: 0;
+            opacity: 0.8;
+            font-size: 0.9em;
+        }
+        
+        .icon {
+            width: 24px;
+            height: 24px;
+        }
+        
+        .instructions {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+        
+        .instructions h3 {
+            margin-top: 0;
+        }
+        
+        .instructions ul {
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 10px;
+        }
+        
+        code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .status {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .links {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐯 Agent Learning Platform 测试页面</h1>
+        
+        <div class="status">
+            <div class="status-item">
+                <span class="status-label">前端服务</span>
+                <span class="status-value online" id="frontend-status">检查中...</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">后端服务</span>
+                <span class="status-value online" id="backend-status">检查中...</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Community 页面</span>
+                <span class="status-value online" id="community-status">检查中...</span>
+            </div>
+        </div>
+        
+        <div class="links">
+            <a href="http://localhost:5174/community" class="link-card" target="_blank">
+                <h3>🚀 Community 页面</h3>
+                <p>测试我们刚刚完成的社区动态页面</p>
+            </a>
+            
+            <a href="http://localhost:5174" class="link-card" target="_blank">
+                <h3>🏠 前端应用</h3>
+                <p>访问完整的前端应用</p>
+            </a>
+            
+            <a href="http://localhost:8002/docs" class="link-card" target="_blank">
+                <h3>📚 API 文档</h3>
+                <p>查看后端 API 文档</p>
+            </a>
+            
+            <a href="http://localhost:8002" class="link-card" target="_blank">
+                <h3>⚙️ 后端 API</h3>
+                <p>测试后端 API 端点</p>
+            </a>
+        </div>
+        
+        <div class="instructions">
+            <h3>测试说明</h3>
+            <ul>
+                <li>点击上面的卡片可以直接访问对应的页面</li>
+                <li>Community 页面包含完整的社区功能：发布动态、点赞、评论、关注用户等</li>
+                <li>前端运行在 <code>http://localhost:5174</code></li>
+                <li>后端运行在 <code>http://localhost:8002</code></li>
+                <li>所有链接都在新标签页中打开</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        // 检查服务状态
+        async function checkService(url, elementId) {
+            try {
+                const response = await fetch(url, { method: 'HEAD', mode: 'no-cors' });
+                document.getElementById(elementId).textContent = '在线';
+                document.getElementById(elementId).className = 'status-value online';
+                return true;
+            } catch (error) {
+                try {
+                    // 尝试使用 XMLHttpRequest
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('HEAD', url, true);
+                    xhr.timeout = 2000;
+                    xhr.onload = function() {
+                        if (xhr.status >= 200 && xhr.status < 400) {
+                            document.getElementById(elementId).textContent = '在线';
+                            document.getElementById(elementId).className = 'status-value online';
+                        } else {
+                            document.getElementById(elementId).textContent = '离线';
+                            document.getElementById(elementId).className = 'status-value offline';
+                        }
+                    };
+                    xhr.onerror = function() {
+                        document.getElementById(elementId).textContent = '离线';
+                        document.getElementById(elementId).className = 'status-value offline';
+                    };
+                    xhr.ontimeout = function() {
+                        document.getElementById(elementId).textContent = '超时';
+                        document.getElementById(elementId).className = 'status-value offline';
+                    };
+                    xhr.send();
+                } catch (e) {
+                    document.getElementById(elementId).textContent = '离线';
+                    document.getElementById(elementId).className = 'status-value offline';
+                }
+                return false;
+            }
+        }
+        
+        // 检查所有服务
+        async function checkAllServices() {
+            await checkService('http://localhost:5174', 'frontend-status');
+            await checkService('http://localhost:8002', 'backend-status');
+            await checkService('http://localhost:5174/community', 'community-status');
+        }
+        
+        // 页面加载时检查服务状态
+        window.addEventListener('load', checkAllServices);
+        
+        // 每30秒检查一次
+        setInterval(checkAllServices, 30000);
+    </script>
+</body>
+</html>

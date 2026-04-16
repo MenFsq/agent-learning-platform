@@ -21,6 +21,15 @@ const routes: RouteRecordRaw[] = [
     }
   },
   {
+    path: '/agent',
+    name: 'Agent',
+    component: () => import('@/views/Agent.vue'),
+    meta: {
+      title: 'Agent工作台',
+      requiresAuth: true
+    }
+  },
+  {
     path: '/learning',
     name: 'Learning',
     component: () => import('@/views/Learning.vue'),
@@ -62,6 +71,15 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/Login.vue'),
     meta: {
       title: '登录',
+      requiresAuth: false
+    }
+  },
+  {
+    path: '/test',
+    name: 'Test',
+    component: () => import('@/views/TestConnection.vue'),
+    meta: {
+      title: '连接测试',
       requiresAuth: false
     }
   },

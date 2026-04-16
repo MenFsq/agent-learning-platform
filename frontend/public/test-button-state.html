@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>按钮状态更新测试</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .tiger-icon {
+            font-size: 2em;
+            margin-right: 10px;
+        }
+        .test-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+        }
+        .agent-list {
+            margin-top: 20px;
+        }
+        .agent-item {
+            padding: 15px;
+            margin: 10px 0;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .agent-info {
+            flex: 1;
+        }
+        .agent-name {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        .agent-status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .status-running {
+            background: rgba(74, 222, 128, 0.2);
+            color: #4ade80;
+        }
+        .status-stopped {
+            background: rgba(248, 113, 113, 0.2);
+            color: #f87171;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .test-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .test-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        .test-button.primary {
+            background: rgba(74, 222, 128, 0.3);
+        }
+        .test-button.primary:hover {
+            background: rgba(74, 222, 128, 0.4);
+        }
+        .test-button.danger {
+            background: rgba(248, 113, 113, 0.3);
+        }
+        .test-button.danger:hover {
+            background: rgba(248, 113, 113, 0.4);
+        }
+        .log-console {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 14px;
+            min-height: 100px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            margin-top: 20px;
+        }
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+            border-left: 3px solid #4ade80;
+            background: rgba(0, 0, 0, 0.2);
+        }
+        .log-error {
+            border-left-color: #f87171;
+        }
+        .log-success {
+            border-left-color: #4ade80;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.7);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><span class="tiger-icon">🐯</span> 按钮状态更新测试</h1>
+        
+        <div class="test-section">
+            <h3>测试说明</h3>
+            <p>这个页面测试前端按钮状态是否会实时更新。点击"启动"或"停止"按钮后，应该：</p>
+            <ol>
+                <li>API调用成功</li>
+                <li>重新获取Agent状态</li>
+                <li>更新按钮显示状态</li>
+                <li>按钮文本从"启动"变为"停止"或反之</li>
+            </ol>
+            
+            <div class="action-buttons">
+                <button class="test-button primary" onclick="loadAgents()">加载Agent列表</button>
+                <button class="test-button" onclick="clearLog()">清空日志</button>
+            </div>
+        </div>
+        
+        <div class="agent-list" id="agentList">
+            <p>点击"加载Agent列表"按钮开始测试</p>
+        </div>
+        
+        <div class="log-console" id="logConsole">
+            <div class="log-entry log-success">按钮状态更新测试控制台</div>
+        </div>
+        
+        <div class="footer">
+            <p>前端地址: http://localhost:5179 | 后端地址: http://localhost:8004</p>
+            <p>测试目标: 验证按钮状态会实时更新，没有缓存问题</p>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE = 'http://localhost:5179/api';
+        const logConsole = document.getElementById('logConsole');
+        const agentList = document.getElementById('agentList');
+        
+        function log(message, type = 'success') {
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logConsole.appendChild(entry);
+            logConsole.scrollTop = logConsole.scrollHeight;
+        }
+        
+        function clearLog() {
+            logConsole.innerHTML = '<div class="log-entry log-success">控制台已清空</div>';
+        }
+        
+        async function loadAgents() {
+            log('加载Agent列表...', 'success');
+            
+            try {
+                const response = await fetch(API_BASE + '/v1/agents');
+                const agents = await response.json();
+                
+                if (response.ok) {
+                    log(`✅ 找到 ${agents.length} 个Agent`, 'success');
+                    renderAgentList(agents);
+                } else {
+                    log(`❌ 加载失败: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ 错误: ${error.message}`, 'error');
+            }
+        }
+        
+        function renderAgentList(agents) {
+            agentList.innerHTML = '';
+            
+            agents.forEach(agent => {
+                const agentEl = document.createElement('div');
+                agentEl.className = 'agent-item';
+                
+                agentEl.innerHTML = `
+                    <div class="agent-info">
+                        <div class="agent-name">${agent.name}</div>
+                        <div style="font-size: 0.8em; opacity: 0.8; margin-top: 5px;">
+                            ID: ${agent.id}<br>
+                            类型: ${agent.type} | 模型: ${agent.config?.model || '未配置'}
+                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        <span class="agent-status ${agent.status === 'running' ? 'status-running' : 'status-stopped'}">
+                            ${agent.status === 'running' ? '运行中' : '已停止'}
+                        </span>
+                        <button class="test-button ${agent.status === 'running' ? 'danger' : 'primary'}" 
+                                onclick="toggleAgentStatus('${agent.id}', '${agent.name}', '${agent.status}')">
+                            ${agent.status === 'running' ? '停止' : '启动'}
+                        </button>
+                    </div>
+                `;
+                
+                agentList.appendChild(agentEl);
+            });
+        }
+        
+        async function toggleAgentStatus(agentId, agentName, currentStatus) {
+            const newStatus = currentStatus === 'running' ? 'stopped' : 'running';
+            const action = currentStatus === 'running' ? 'stop' : 'start';
+            
+            log(`${currentStatus === 'running' ? '停止' : '启动'} Agent: ${agentName}...`, 'success');
+            
+            try {
+                const response = await fetch(API_BASE + `/v1/agents/${agentId}/${action}`, {
+                    method: 'POST'
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    log(`✅ ${result.message}`, 'success');
+                    
+                    // 等待一下，然后重新加载Agent列表
+                    log('重新加载Agent列表以更新状态...', 'success');
+                    setTimeout(loadAgents, 1000);
+                } else {
+                    log(`❌ 操作失败: ${JSON.stringify(result)}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ 错误: ${error.message}`, 'error');
+            }
+        }
+        
+        // 页面加载时自动加载Agent列表
+        window.addEventListener('load', () => {
+            setTimeout(loadAgents, 1000);
+        });
+    </script>
+</body>
+</html>
