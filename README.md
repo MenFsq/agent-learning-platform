@@ -29,6 +29,7 @@
 - ✅ **开源协作**：MIT协议，欢迎社区贡献
 
 GitHub 仓库：[MenFsq/agent-learning-platform](https://github.com/MenFsq/agent-learning-platform)
+Demo 地址：[Agent Learning](https://menfsq.github.io/agent-learning-platform/)
 
 ---
 
