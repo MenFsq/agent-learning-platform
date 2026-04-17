@@ -135,7 +135,7 @@ curl http://localhost:8004/api/v1/system/status
 
 ### 🔧 **配置文件**
 1. **前端配置**: `frontend/vite.config.ts`
-2. **后端配置**: `backend/start_simple.py`
+2. **后端配置**: `backend/start_unified.py`
 3. **依赖配置**: `requirements.txt` / `package.json`
 4. **代理配置**: 已正确配置
 

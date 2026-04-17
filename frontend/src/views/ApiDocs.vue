@@ -1,5 +1,6 @@
 <template>
-  <div class="api-docs">
+  <div class="api-docs-page">
+    <div class="api-docs">
     <!-- 页面头部 -->
     <div class="docs-header">
       <div class="header-content">
@@ -380,6 +381,7 @@
         </el-card>
       </div>
     </div>
+    </div>
   </div>
 </template>
 
@@ -641,7 +643,7 @@ const sendTestRequest = async () => {
       }
     }
     
-    // 如果是需要认证的端点，添加token
+    // 免登录模式下，如本地有 token 则附带，没有则直接请求
     if (selectedEndpoint.value.requiresAuth) {
       const token = localStorage.getItem('token')
       if (token) {
@@ -649,10 +651,6 @@ const sendTestRequest = async () => {
           ...config.headers,
           'Authorization': `Bearer ${token}`
         }
-      } else {
-        ElMessage.warning('此端点需要认证，请先登录')
-        testing.value = false
-        return
       }
     }
     
@@ -741,11 +739,23 @@ onMounted(() => {
 
 <style scoped lang="scss">
 
+.api-docs-page {
+  flex: 1;
+  min-height: calc(100dvh - var(--header-height));
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--app-bg);
+  overflow: visible;
+}
+
 .api-docs {
   position: relative;
   z-index: 1;
-  margin: 40px auto 40px auto;
-  max-width: 980px;
+  flex: 0 0 auto;
+  margin: 24px auto 40px auto;
+  width: calc(100% - 64px);
+  max-width: 1320px;
   border-radius: 22px;
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.10), 0 1.5px 8px 0 rgba(31,38,135,0.04);
   background: rgba(255,255,255,0.55);
@@ -934,6 +944,12 @@ onMounted(() => {
   }
   
   .endpoints-list {
+    overflow-x: auto;
+
+    :deep(.el-table) {
+      min-width: 920px;
+    }
+
     :deep(.auth-required-row) {
       background-color: rgba(var(--el-color-danger-rgb), 0.05);
       
@@ -1207,6 +1223,8 @@ onMounted(() => {
 // 响应式设计
 @media (max-width: 768px) {
   .api-docs {
+    width: calc(100% - 24px);
+    margin-top: 16px;
     padding: 16px;
   }
   

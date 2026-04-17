@@ -146,15 +146,15 @@
                 <p><strong>地址：</strong> http://localhost:5175</p>
                 <p><strong>状态：</strong> <span class="status-success">运行正常</span></p>
                 <p><strong>最后编译：</strong> 刚刚完成</p>
-                <p><strong>环境变量：</strong> VITE_API_BASE_URL=http://localhost:8003</p>
+                <p><strong>环境变量：</strong> VITE_API_BASE_URL=http://localhost:8004</p>
             </div>
             
             <div class="status-card">
                 <h3><span class="status-icon">✅</span> 后端服务状态</h3>
-                <p><strong>地址：</strong> http://localhost:8003</p>
+                <p><strong>地址：</strong> http://localhost:8004</p>
                 <p><strong>状态：</strong> <span class="status-success">运行正常</span></p>
-                <p><strong>API文档：</strong> http://localhost:8003/docs</p>
-                <p><strong>代理配置：</strong> 前端代理到 /api → http://localhost:8003</p>
+                <p><strong>API文档：</strong> http://localhost:8004/docs</p>
+                <p><strong>代理配置：</strong> 前端代理到 /api → http://localhost:8004</p>
             </div>
             
             <div class="status-card">
@@ -177,12 +177,12 @@
                 <p>访问 Agent Learning Platform 首页</p>
             </a>
             
-            <a href="http://localhost:8003/docs" class="link-card" target="_blank">
+            <a href="http://localhost:8004/docs" class="link-card" target="_blank">
                 <h4><span class="link-icon">📚</span> API 文档</h4>
                 <p>查看后端 API 接口文档</p>
             </a>
             
-            <a href="http://localhost:8003/health" class="link-card" target="_blank">
+            <a href="http://localhost:8004/health" class="link-card" target="_blank">
                 <h4><span class="link-icon">💓</span> 健康检查</h4>
                 <p>检查后端服务健康状态</p>
             </a>
@@ -261,10 +261,10 @@
         async function checkServices() {
             const services = [
                 { name: '前端', url: 'http://localhost:5175' },
-                { name: '后端', url: 'http://localhost:8003' },
-                { name: 'API文档', url: 'http://localhost:8003/docs' },
+                { name: '后端', url: 'http://localhost:8004' },
+                { name: 'API文档', url: 'http://localhost:8004/docs' },
                 { name: '前端代理', url: 'http://localhost:5175/api/health' },
-                { name: '前端直接API', url: 'http://localhost:8003/health' }
+                { name: '前端直接API', url: 'http://localhost:8004/health' }
             ];
             
             for (const service of services) {

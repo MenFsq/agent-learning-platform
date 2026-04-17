@@ -7,8 +7,7 @@ const routes: RouteRecordRaw[] = [
     name: 'Dashboard',
     component: () => import('@/views/Dashboard.vue'),
     meta: {
-      title: '仪表板',
-      requiresAuth: true
+      title: '仪表板'
     }
   },
   {
@@ -16,8 +15,7 @@ const routes: RouteRecordRaw[] = [
     name: 'Projects',
     component: () => import('@/views/Projects.vue'),
     meta: {
-      title: '项目管理',
-      requiresAuth: true
+      title: '项目管理'
     }
   },
   {
@@ -25,8 +23,7 @@ const routes: RouteRecordRaw[] = [
     name: 'Agent',
     component: () => import('@/views/Agent.vue'),
     meta: {
-      title: 'Agent工作台',
-      requiresAuth: true
+      title: 'Agent工作台'
     }
   },
   {
@@ -34,8 +31,7 @@ const routes: RouteRecordRaw[] = [
     name: 'Learning',
     component: () => import('@/views/Learning.vue'),
     meta: {
-      title: '学习指南',
-      requiresAuth: true
+      title: '学习指南'
     }
   },
   {
@@ -43,8 +39,7 @@ const routes: RouteRecordRaw[] = [
     name: 'Community',
     component: () => import('@/views/Community.vue'),
     meta: {
-      title: '社区动态',
-      requiresAuth: true
+      title: '社区动态'
     }
   },
   {
@@ -52,8 +47,7 @@ const routes: RouteRecordRaw[] = [
     name: 'Settings',
     component: () => import('@/views/Settings.vue'),
     meta: {
-      title: '系统设置',
-      requiresAuth: true
+      title: '系统设置'
     }
   },
   {
@@ -61,26 +55,19 @@ const routes: RouteRecordRaw[] = [
     name: 'ApiDocs',
     component: () => import('@/views/ApiDocs.vue'),
     meta: {
-      title: 'API文档',
-      requiresAuth: false
+      title: 'API文档'
     }
   },
   {
     path: '/login',
-    name: 'Login',
-    component: () => import('@/views/Login.vue'),
-    meta: {
-      title: '登录',
-      requiresAuth: false
-    }
+    redirect: '/'
   },
   {
     path: '/test',
     name: 'Test',
     component: () => import('@/views/TestConnection.vue'),
     meta: {
-      title: '连接测试',
-      requiresAuth: false
+      title: '连接测试'
     }
   },
   {
@@ -98,30 +85,11 @@ const router = createRouter({
   routes
 })
 
-// 路由守卫
-router.beforeEach((to, _from, next) => {
+router.beforeEach((to) => {
   // 设置页面标题
   if (to.meta.title) {
     document.title = `${to.meta.title} - Agent Learning Platform`
   }
-
-  // 开发环境：跳过认证检查
-  if (import.meta.env.DEV) {
-    console.log('开发环境：跳过认证检查')
-    next()
-    return
-  }
-
-  // 生产环境：检查是否需要认证
-  if (to.meta.requiresAuth) {
-    const isAuthenticated = localStorage.getItem('token')
-    if (!isAuthenticated) {
-      next('/login')
-      return
-    }
-  }
-
-  next()
 })
 
 export default router

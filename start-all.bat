@@ -43,7 +43,7 @@ timeout /t 3 >nul
 echo.
 echo [3] 启动后端服务...
 echo.
-start "后端服务" cmd /k "cd /d backend && echo 启动后端API服务器... && .\venv\Scripts\activate && python start-simple.py"
+start "后端服务" cmd /k "cd /d backend && echo 启动统一后端API服务器... && ..\.venv\Scripts\python.exe start_unified.py"
 timeout /t 3 >nul
 
 echo.
@@ -51,7 +51,7 @@ echo [4] 验证服务状态...
 echo.
 
 echo   测试前端服务...
-curl -s -o nul -w "%%{http_code}" http://localhost:5175
+curl -s -o nul -w "%%{http_code}" http://localhost:5174
 if errorlevel 1 (
     echo   前端服务: 启动中...
 ) else (
@@ -59,7 +59,7 @@ if errorlevel 1 (
 )
 
 echo   测试后端服务...
-curl -s -o nul -w "%%{http_code}" http://localhost:8001/
+curl -s -o nul -w "%%{http_code}" http://localhost:8005/health
 if errorlevel 1 (
     echo   后端服务: 启动中...
 ) else (
@@ -71,15 +71,15 @@ echo ========================================
 echo   启动完成！
 echo ========================================
 echo.
-echo   前端应用: http://localhost:5175
-echo   后端API:  http://localhost:8001
-echo   API文档: http://localhost:8001/docs
+echo   前端应用: http://localhost:5174
+echo   后端API:  http://localhost:8005
+echo   API文档: http://localhost:8005/docs
 echo.
 echo   按任意键打开浏览器访问...
 pause >nul
 
-start http://localhost:5175
-start http://localhost:8001/docs
+start http://localhost:5174
+start http://localhost:8005/docs
 
 echo.
 echo   服务已启动，可以开始开发！

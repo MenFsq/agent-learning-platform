@@ -173,20 +173,20 @@
                 <p><strong>地址：</strong> http://localhost:5175</p>
                 <p><strong>状态：</strong> <span class="status-success">运行正常</span></p>
                 <p><strong>端口：</strong> 5175 (自动从 5174 切换)</p>
-                <p><strong>环境：</strong> VITE_API_BASE_URL=http://localhost:8003</p>
+                <p><strong>环境：</strong> VITE_API_BASE_URL=http://localhost:8004</p>
             </div>
             
             <div class="status-card">
                 <h3><span class="status-icon">✅</span> 后端服务</h3>
-                <p><strong>地址：</strong> http://localhost:8003</p>
+                <p><strong>地址：</strong> http://localhost:8004</p>
                 <p><strong>状态：</strong> <span class="status-success">运行正常</span></p>
-                <p><strong>API文档：</strong> http://localhost:8003/docs</p>
-                <p><strong>健康检查：</strong> http://localhost:8003/health</p>
+                <p><strong>API文档：</strong> http://localhost:8004/docs</p>
+                <p><strong>健康检查：</strong> http://localhost:8004/health</p>
             </div>
             
             <div class="status-card">
                 <h3><span class="status-icon">🔧</span> 代理配置</h3>
-                <p><strong>前端代理：</strong> /api → http://localhost:8003</p>
+                <p><strong>前端代理：</strong> /api → http://localhost:8004</p>
                 <p><strong>测试地址：</strong> http://localhost:5175/api/health</p>
                 <p><strong>CORS配置：</strong> localhost:5174-5179</p>
                 <p><strong>通信状态：</strong> <span class="status-success">正常</span></p>
@@ -209,7 +209,7 @@
                 <p>访问Agent Learning Platform首页</p>
             </a>
             
-            <a href="http://localhost:8003/docs" class="link-card" target="_blank">
+            <a href="http://localhost:8004/docs" class="link-card" target="_blank">
                 <h4><span class="link-icon">📚</span> API文档</h4>
                 <p>查看后端API接口文档</p>
             </a>
@@ -219,7 +219,7 @@
                 <p>查看详细的测试报告</p>
             </a>
             
-            <a href="http://localhost:8003/api/v1/agents" class="link-card" target="_blank">
+            <a href="http://localhost:8004/api/v1/agents" class="link-card" target="_blank">
                 <h4><span class="link-icon">🔍</span> Agent API</h4>
                 <p>直接测试Agent接口</p>
             </a>
@@ -246,7 +246,7 @@
                     <div class="fix-checkbox checked"></div>
                     <div>
                         <strong>端口配置错误</strong>
-                        <p>修正前端环境变量 VITE_API_BASE_URL=http://localhost:8003</p>
+                        <p>修正前端环境变量 VITE_API_BASE_URL=http://localhost:8004</p>
                     </div>
                 </li>
                 <li class="fix-item">
@@ -300,7 +300,7 @@
             resultEl.innerHTML = '测试中...';
             
             try {
-                const response = await fetch('http://localhost:8003/api/v1/agents');
+                const response = await fetch('http://localhost:8004/api/v1/agents');
                 if (response.ok) {
                     const data = await response.json();
                     resultEl.innerHTML = `<span style="color:#4ade80">✅ 成功！返回 ${data.length} 个Agent</span><br>`;
@@ -318,7 +318,7 @@
             resultEl.innerHTML = '测试中...';
             
             try {
-                const response = await fetch('http://localhost:8003/health');
+                const response = await fetch('http://localhost:8004/health');
                 if (response.ok) {
                     const data = await response.json();
                     resultEl.innerHTML = `<span style="color:#4ade80">✅ 成功！服务状态: ${data.status}</span><br>`;

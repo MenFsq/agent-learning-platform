@@ -17,7 +17,7 @@ import { useAppStore } from './store/app'
 const route = useRoute()
 const appStore = useAppStore()
 
-const showHeader = computed(() => !['Login', 'NotFound'].includes(String(route.name ?? '')))
+const showHeader = computed(() => String(route.name ?? '') !== 'NotFound')
 
 onMounted(() => {
   appStore.initialize()
@@ -27,22 +27,25 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .app-shell {
-  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   position: relative;
   z-index: 1;
+  overflow-x: hidden;
 }
 
 .main-content {
   flex: 1;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  min-height: 100dvh;
+  overflow: visible;
   transition: padding-top var(--transition-base);
 }
 
 .app-shell.with-header .main-content {
   padding-top: var(--header-height);
+  min-height: calc(100dvh - var(--header-height));
 }
 </style>

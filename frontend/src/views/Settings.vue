@@ -514,11 +514,17 @@ const handleAvatarUpload = (file: any) => {
 
 <style scoped>
 .settings-page {
-  min-height: 100vh;
+  flex: 1;
+  min-height: calc(100dvh - var(--header-height));
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
   background: var(--app-bg);
+  overflow: hidden;
 }
 
 .page-header {
+  flex-shrink: 0;
   padding: 24px 32px;
   border-bottom: 1px solid var(--line-soft);
   background: var(--app-bg-elevated);
@@ -560,14 +566,20 @@ const handleAvatarUpload = (file: any) => {
 
 .settings-content {
   display: flex;
-  min-height: calc(100vh - 120px);
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .settings-sidebar {
   width: 240px;
+  flex-shrink: 0;
   border-right: 1px solid var(--line-soft);
   background: var(--app-bg-elevated);
   padding: 24px 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .sidebar-section {
@@ -622,8 +634,10 @@ const handleAvatarUpload = (file: any) => {
 
 .settings-detail {
   flex: 1;
+  min-width: 0;
   padding: 32px;
   overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .settings-section {
@@ -682,6 +696,7 @@ const handleAvatarUpload = (file: any) => {
     width: 100%;
     border-right: none;
     border-bottom: 1px solid var(--line-soft);
+    overflow-y: visible;
   }
 
   .nav-list {

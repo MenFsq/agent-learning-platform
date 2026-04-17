@@ -695,11 +695,17 @@ onMounted(async () => {
 
 <style scoped lang="scss">
 .agent-page {
-  min-height: 100vh;
+  flex: 1;
+  min-height: calc(100dvh - var(--header-height));
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
   background: var(--app-bg);
+  overflow: hidden;
 }
 
 .page-header {
+  flex-shrink: 0;
   padding: 24px 32px;
   border-bottom: 1px solid var(--line-soft);
   background: var(--app-bg-elevated);
@@ -747,12 +753,16 @@ onMounted(async () => {
 
 .agent-content {
   display: flex;
-  height: calc(100vh - 120px);
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
   overflow: hidden;
 }
 
 .agent-list-section {
   width: 320px;
+  min-height: 0;
+  flex-shrink: 0;
   border-right: 1px solid var(--line-soft);
   display: flex;
   flex-direction: column;
@@ -787,6 +797,7 @@ onMounted(async () => {
 .agent-list {
   flex: 1;
   overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 16px;
 }
 
@@ -967,13 +978,66 @@ onMounted(async () => {
 
 .agent-detail-section {
   flex: 1;
+  min-width: 0;
   overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 24px;
 }
 
 .detail-panel {
   max-width: 1200px;
   margin: 0 auto;
+}
+
+@media (max-width: 1024px) {
+  .agent-content {
+    flex-direction: column;
+  }
+
+  .agent-list-section {
+    width: 100%;
+    max-height: 320px;
+    border-right: none;
+    border-bottom: 1px solid var(--line-soft);
+  }
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    padding: 16px;
+  }
+
+  .header-content {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .action-buttons {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .agent-detail-section {
+    padding: 16px;
+  }
+
+  .detail-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .detail-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .status-meta,
+  .model-meta,
+  .config-content {
+    grid-template-columns: 1fr;
+  }
 }
 
 .detail-header {

@@ -98,7 +98,7 @@
             <div class="login-footer">
               <div class="demo-account">
                 <span>演示账号</span>
-                <strong class="metric-mono">admin / admin123</strong>
+                <strong class="metric-mono">testuser / testpass</strong>
               </div>
 
               <div class="quick-login">
@@ -135,11 +135,13 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { User, Lock } from '@element-plus/icons-vue'
 import type { FormInstance, FormRules } from 'element-plus'
+
+import { authAPI } from '@/utils/api'
 
 const orbitNodes = [
   {
@@ -177,12 +179,36 @@ const loginForm = reactive({
 const loginRules: FormRules = {
   username: [
     { required: true, message: '请输入用户名', trigger: 'blur' },
-    { min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'blur' }
+    { min: 3, max: 50, message: '长度在 3 到 50 个字符', trigger: 'blur' }
   ],
   password: [
     { required: true, message: '请输入密码', trigger: 'blur' },
-    { min: 6, max: 20, message: '长度在 6 到 20 个字符', trigger: 'blur' }
+    { min: 6, max: 64, message: '长度在 6 到 64 个字符', trigger: 'blur' }
   ]
+}
+
+const buildUserProfile = (user: { id: number; username: string; email: string; full_name?: string | null }) => ({
+  id: user.id,
+  username: user.username,
+  email: user.email,
+  name: user.full_name || user.username,
+  role: 'user',
+  avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(user.username)}`
+})
+
+const getErrorMessage = (error: unknown) => {
+  if (
+    typeof error === 'object' &&
+    error !== null &&
+    'response' in error &&
+    typeof error.response === 'object' &&
+    error.response !== null &&
+    'data' in error.response
+  ) {
+    const data = (error.response as { data?: { detail?: string } }).data
+    if (data?.detail) return data.detail
+  }
+  return '登录失败，请检查用户名和密码'
 }
 
 // 处理登录
@@ -195,19 +221,15 @@ const handleLogin = async () => {
   loading.value = true
 
   try {
-    // 模拟API调用延迟
-    await new Promise(resolve => setTimeout(resolve, 1000))
-
-    // 模拟登录成功
-    const token = `mock-token-${Date.now()}`
-    localStorage.setItem('token', token)
-    localStorage.setItem('user', JSON.stringify({
-      id: 1,
+    const response = await authAPI.login({
       username: loginForm.username,
-      name: loginForm.username === 'admin' ? '管理员' : '用户',
-      role: loginForm.username === 'admin' ? 'admin' : 'user',
-      avatar: 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
-    }))
+      password: loginForm.password
+    })
+
+    const { access_token, refresh_token, user } = response.data
+    localStorage.setItem('token', access_token)
+    localStorage.setItem('refresh_token', refresh_token)
+    localStorage.setItem('user', JSON.stringify(buildUserProfile(user)))
 
     // 记住我功能
     if (loginForm.remember) {
@@ -218,10 +240,9 @@ const handleLogin = async () => {
 
     ElMessage.success('登录成功！')
 
-    // 跳转到首页
     router.push('/')
   } catch (error) {
-    ElMessage.error('登录失败，请检查用户名和密码')
+    ElMessage.error(getErrorMessage(error))
   } finally {
     loading.value = false
   }
@@ -230,14 +251,14 @@ const handleLogin = async () => {
 // 快速登录
 const quickLogin = (type: string) => {
   if (type === 'admin') {
-    loginForm.username = 'admin'
-    loginForm.password = 'admin123'
+    loginForm.username = 'testuser'
+    loginForm.password = 'testpass'
   } else if (type === 'user') {
-    loginForm.username = 'user'
-    loginForm.password = 'user123'
+    loginForm.username = 'testuser'
+    loginForm.password = 'testpass'
   } else {
-    loginForm.username = 'guest'
-    loginForm.password = 'guest123'
+    loginForm.username = 'testuser'
+    loginForm.password = 'testpass'
   }
 
   // 自动触发登录
@@ -245,6 +266,14 @@ const quickLogin = (type: string) => {
     handleLogin()
   }, 100)
 }
+
+onMounted(() => {
+  const rememberedUser = localStorage.getItem('rememberedUser')
+  if (rememberedUser) {
+    loginForm.username = rememberedUser
+    loginForm.remember = true
+  }
+})
 </script>
 
 <style scoped lang="scss">

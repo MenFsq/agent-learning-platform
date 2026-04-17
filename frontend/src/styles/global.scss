@@ -16,6 +16,9 @@ body,
 
 body {
   margin: 0;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  overflow-y: auto;
   font-family: var(--font-sans);
   color: var(--text-primary);
   background:
@@ -86,6 +89,7 @@ img {
 #app {
   position: relative;
   isolation: isolate;
+  min-height: 100dvh;
 }
 
 .page-container {

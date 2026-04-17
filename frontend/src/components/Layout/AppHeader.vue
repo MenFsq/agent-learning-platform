@@ -94,6 +94,10 @@
                 <Settings2 class="dropdown-icon" />
                 系统设置
               </el-dropdown-item>
+              <el-dropdown-item class="menu-item" divided @click="resetLocalProfile">
+                <LogOut class="dropdown-icon" />
+                清空本地资料
+              </el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown>
@@ -118,6 +122,7 @@ import {
   Sparkles,
   SunMedium,
   UserRound,
+  LogOut,
   Users,
   FileCode,
   Bot
@@ -133,11 +138,43 @@ const { theme } = storeToRefs(appStore)
 const searchQuery = ref('')
 const isScrolled = ref(false)
 
-const user = reactive({
+const defaultUser = {
   name: '小老虎',
   role: 'Workspace Owner',
   avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=agent-learning'
-})
+}
+
+const user = reactive({ ...defaultUser })
+
+const syncUserFromStorage = () => {
+  const rawUser = localStorage.getItem('user')
+  if (!rawUser) {
+    Object.assign(user, defaultUser)
+    return
+  }
+
+  try {
+    const parsedUser = JSON.parse(rawUser) as {
+      name?: string
+      username?: string
+      role?: string
+      avatar?: string
+    }
+    user.name = parsedUser.name || parsedUser.username || user.name
+    user.role = parsedUser.role || user.role
+    user.avatar = parsedUser.avatar || user.avatar
+  } catch (_error) {
+    localStorage.removeItem('user')
+    Object.assign(user, defaultUser)
+  }
+}
+
+const resetLocalProfile = () => {
+  localStorage.removeItem('token')
+  localStorage.removeItem('refresh_token')
+  localStorage.removeItem('user')
+  syncUserFromStorage()
+}
 
 const navItems = [
   { path: '/', name: '仪表板', icon: LayoutDashboard },
@@ -162,12 +199,15 @@ const handleScroll = () => {
 }
 
 onMounted(() => {
+  syncUserFromStorage()
   handleScroll()
   window.addEventListener('scroll', handleScroll, { passive: true })
+  window.addEventListener('storage', syncUserFromStorage)
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('scroll', handleScroll)
+  window.removeEventListener('storage', syncUserFromStorage)
 })
 </script>
 

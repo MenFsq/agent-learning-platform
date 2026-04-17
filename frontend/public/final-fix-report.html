@@ -266,8 +266,8 @@
                 <div class="problem-icon fixed">✅</div>
                 <div>
                     <strong>问题2: 后端版本错误</strong>
-                    <p><strong>应该使用</strong>: <code>start_with_agent.py</code> (完整版 + LangChain)</p>
-                    <p><strong>实际使用</strong>: <code>start_complete.py</code> (简化版)</p>
+                    <p><strong>当前统一入口</strong>: <code>start_unified.py</code> (统一版后端)</p>
+                    <p><strong>已完成整合</strong>: 旧的完整/简化启动脚本已被统一入口替代</p>
                     <p><strong>结果</strong>: 缺少LangChain功能，ID格式不匹配</p>
                 </div>
             </div>
@@ -310,8 +310,8 @@
                 <div class="fix-icon">3</div>
                 <div>
                     <strong>启动完整版后端</strong>
-                    <p>使用 <code>start_with_agent.py</code> (端口8004) 而不是简化版</p>
-                    <div class="code-block">python start_with_agent.py  # 完整版 + LangChain</div>
+                    <p>使用 <code>start_unified.py</code> (端口8004) 作为唯一后端入口</p>
+                    <div class="code-block">python start_unified.py  # 统一版后端入口</div>
                 </div>
             </div>
             

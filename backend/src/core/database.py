@@ -19,13 +19,22 @@ from ..models.system import Base as SystemBase
 # 合并所有Base
 Base = declarative_base()
 
+database_url = get_database_url()
+connect_args = {}
+if database_url.startswith("postgresql+asyncpg://"):
+    connect_args = {
+        "timeout": 5,
+        "command_timeout": 10,
+    }
+
 # 创建异步引擎
 engine = create_async_engine(
-    get_database_url(),
+    database_url,
     echo=settings.DEBUG,
     future=True,
     pool_pre_ping=True,
     pool_recycle=3600,
+    connect_args=connect_args,
 )
 
 # 创建异步会话工厂

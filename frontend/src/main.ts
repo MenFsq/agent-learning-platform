@@ -11,18 +11,6 @@ import router from './router'
 
 import './styles/global.scss'
 
-// 开发环境：添加模拟token
-if (import.meta.env.DEV) {
-  console.log('开发环境：设置模拟token')
-  localStorage.setItem('token', 'dev-mock-token-123456')
-  localStorage.setItem('user', JSON.stringify({
-    id: 1,
-    name: '小老虎 🐯',
-    email: 'tiger@agent-learning.com',
-    role: 'admin'
-  }))
-}
-
 const app = createApp(App)
 
 // 注册Element Plus图标

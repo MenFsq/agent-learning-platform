@@ -183,12 +183,12 @@
                 <p>访问完整的前端应用</p>
             </a>
             
-            <a href="http://localhost:8002/docs" class="link-card" target="_blank">
+            <a href="http://localhost:8004/docs" class="link-card" target="_blank">
                 <h3>📚 API 文档</h3>
                 <p>查看后端 API 文档</p>
             </a>
             
-            <a href="http://localhost:8002" class="link-card" target="_blank">
+            <a href="http://localhost:8004" class="link-card" target="_blank">
                 <h3>⚙️ 后端 API</h3>
                 <p>测试后端 API 端点</p>
             </a>
@@ -200,7 +200,7 @@
                 <li>点击上面的卡片可以直接访问对应的页面</li>
                 <li>Community 页面包含完整的社区功能：发布动态、点赞、评论、关注用户等</li>
                 <li>前端运行在 <code>http://localhost:5174</code></li>
-                <li>后端运行在 <code>http://localhost:8002</code></li>
+                <li>后端运行在 <code>http://localhost:8004</code></li>
                 <li>所有链接都在新标签页中打开</li>
             </ul>
         </div>
@@ -249,7 +249,7 @@
         // 检查所有服务
         async function checkAllServices() {
             await checkService('http://localhost:5174', 'frontend-status');
-            await checkService('http://localhost:8002', 'backend-status');
+            await checkService('http://localhost:8004', 'backend-status');
             await checkService('http://localhost:5174/community', 'community-status');
         }
         

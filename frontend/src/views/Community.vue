@@ -454,7 +454,7 @@ const posts = ref<Post[]>([
       role: 'AI Agent开发者',
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=openclaw'
     },
-    content: 'Agent Learning Platform项目进展：已完成所有核心页面开发，前端运行在5174端口，后端运行在8005端口。',
+    content: 'Agent Learning Platform项目进展：已完成所有核心页面开发，前端运行在5174端口，后端统一运行在8004端口。',
     time: '6小时前',
     images: [],
     likes: 36,
@@ -641,11 +641,17 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .community-page {
-  min-height: 100vh;
+  flex: 1;
+  min-height: calc(100dvh - var(--header-height));
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
   background: var(--app-bg);
+  overflow: visible;
 }
 
 .page-header {
+  flex-shrink: 0;
   padding: 24px 32px;
   border-bottom: 1px solid var(--line-soft);
   background: var(--app-bg-elevated);
@@ -782,7 +788,10 @@ onMounted(() => {
 }
 
 .community-content {
+  width: 100%;
   display: flex;
+  flex: 1;
+  min-width: 0;
   gap: 24px;
   padding: 24px 32px;
   max-width: 1400px;

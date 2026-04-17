@@ -17,7 +17,7 @@ echo [3] 打开前端应用主页...
 start "" "http://localhost:5174"
 
 echo [4] 打开后端 API 文档...
-start "" "http://localhost:8002/docs"
+start "" "http://localhost:8004/docs"
 
 echo.
 echo   所有页面已在新窗口中打开！

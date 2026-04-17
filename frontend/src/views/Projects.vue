@@ -800,7 +800,7 @@ onMounted(async () => {
 
 <style scoped lang="scss">
 .projects-page {
-  min-height: 100vh;
+  min-height: calc(100dvh - var(--header-height));
   background: var(--app-bg);
 }
 

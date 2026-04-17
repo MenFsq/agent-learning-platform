@@ -42,21 +42,43 @@ Demo 地址：[Agent Learning](https://menfsq.github.io/agent-learning-platform/
 git clone https://github.com/MenFsq/agent-learning-platform.git
 cd agent-learning-platform
 
-# 2. 启动后端服务（完整版 + LangChain）
+# 2. 配置后端环境变量
+cd backend
+cp .env.example .env
+# 然后在 .env 中至少填写：
+# DEEPSEEK_API_KEY=your-deepseek-api-key
+
+# 3. 启动后端服务（统一入口）
 cd backend
 pip install -r requirements.txt
-python start_with_agent.py
+python start_unified.py
 # 服务运行在 http://localhost:8004
 
-# 3. 启动前端服务
+# 4. 启动前端服务
 cd frontend
 npm install
 npm run dev
 # 服务运行在 http://localhost:5174
 
-# 4. 访问平台
+# 5. 访问平台
 # 打开浏览器访问 http://localhost:5174/agent
 ```
+
+### DeepSeek 配置
+
+统一后端默认兼容 DeepSeek 的 OpenAI 协议，推荐在 `backend/.env` 中配置：
+
+```env
+DEEPSEEK_API_KEY=your-deepseek-api-key
+DEEPSEEK_BASE_URL=https://api.deepseek.com
+DEFAULT_CHAT_MODEL=deepseek-chat
+DEFAULT_REASONER_MODEL=deepseek-reasoner
+```
+
+说明：
+- `start_unified.py` 会优先使用 `DEEPSEEK_API_KEY`
+- 如果未配置 DeepSeek key，后端才会回退到 `OPENAI_API_KEY`
+- 不要把真实 key 提交到仓库，建议只保存在本地 `.env`
 
 ### 📊 系统状态验证
 
@@ -246,9 +268,7 @@ agent-learning-platform/
 │   │   │   ├── agent_service.py # Agent业务逻辑
 │   │   │   └── langchain_service.py # LangChain集成
 │   │   └── main.py              # 应用入口
-│   ├── langchain_agent.py       # LangChain Agent实现
-│   ├── start_with_agent.py      # 完整版启动脚本
-│   ├── start_complete.py        # 简化版启动脚本
+│   ├── start_unified.py         # 统一启动脚本
 │   ├── requirements.txt         # Python依赖
 │   └── check_status_simple.py   # 系统状态检查
 │
@@ -316,10 +336,10 @@ agent-learning-platform/
 git clone https://github.com/MenFsq/agent-learning-platform.git
 cd agent-learning-platform
 
-# 启动后端服务（完整版 + LangChain）
+# 启动后端服务（统一入口）
 cd backend
 pip install -r requirements.txt
-python start_with_agent.py
+python start_unified.py
 # 访问 http://localhost:8004/docs 查看API文档
 
 # 启动前端服务（新终端）

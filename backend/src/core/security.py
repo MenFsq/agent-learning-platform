@@ -11,7 +11,8 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from .config import settings
 
 # 密码哈希上下文
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# 默认使用更稳定的 pbkdf2_sha256，新老 bcrypt 哈希仍可继续验证。
+pwd_context = CryptContext(schemes=["pbkdf2_sha256", "bcrypt"], deprecated="auto")
 
 # JWT Bearer认证
 security = HTTPBearer()
