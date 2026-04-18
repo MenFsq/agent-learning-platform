@@ -36,7 +36,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { healthAPI, agentAPI } from '@/utils/api'
+import { healthAPI, agentAPI } from '@/api/index.ts'
 
 const backendHealth = ref<any>(null)
 const agents = ref<any[]>([])

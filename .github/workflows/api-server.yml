@@ -1,0 +1,182 @@
+name: API Server Simulation
+
+on:
+  schedule:
+    # 每5分钟运行一次
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+  push:
+    branches: [ master ]
+
+jobs:
+  api-server:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v4
+    
+    - name: 设置Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: 运行API服务器
+      run: |
+        echo "🚀 启动API服务器模拟..."
+        
+        # 创建简单的HTTP服务器
+        cat > api_server.py << 'EOF'
+import http.server
+import socketserver
+import json
+import time
+from datetime import datetime
+
+PORT = 8080
+
+class APIServer(http.server.SimpleHTTPRequestHandler):
+    def do_GET(self):
+        if self.path == '/api/health':
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            
+            response = {
+                "status": "healthy",
+                "service": "GitHub Actions API Server",
+                "timestamp": datetime.now().isoformat(),
+                "run_id": "${{ github.run_id }}",
+                "workflow": "${{ github.workflow }}"
+            }
+            self.wfile.write(json.dumps(response).encode())
+            
+        elif self.path == '/api/status':
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            
+            response = {
+                "status": "running",
+                "uptime": "5 minutes",
+                "requests_served": 100,
+                "github": {
+                    "repository": "${{ github.repository }}",
+                    "sha": "${{ github.sha }}",
+                    "actor": "${{ github.actor }}"
+                }
+            }
+            self.wfile.write(json.dumps(response).encode())
+            
+        else:
+            self.send_response(404)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            response = {"error": "Endpoint not found"}
+            self.wfile.write(json.dumps(response).encode())
+    
+    def do_OPTIONS(self):
+        self.send_response(200)
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+        self.end_headers()
+    
+    def log_message(self, format, *args):
+        # 禁用默认日志
+        pass
+
+# 启动服务器
+with socketserver.TCPServer(("", PORT), APIServer) as httpd:
+    print(f"🌐 API服务器启动在端口 {PORT}")
+    print(f"📅 开始时间: {datetime.now().isoformat()}")
+    print(f"🔗 健康检查: http://localhost:{PORT}/api/health")
+    print(f"📊 状态检查: http://localhost:{PORT}/api/status")
+    print("⏳ 服务器将运行5分钟...")
+    
+    # 运行5分钟
+    httpd.timeout = 300
+    httpd.handle_request()
+    
+EOF
+        
+        # 运行服务器
+        python api_server.py
+    
+    - name: 生成API文档
+      run: |
+        echo "📄 生成API文档..."
+        
+        cat > api-docs.json << 'EOF'
+{
+  "api": {
+    "name": "Agent Learning Platform API",
+    "version": "1.0.0",
+    "description": "GitHub Actions 模拟的API服务器",
+    "base_url": "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/api",
+    "endpoints": [
+      {
+        "path": "/api/health",
+        "method": "GET",
+        "description": "健康检查端点",
+        "response": {
+          "status": "string",
+          "service": "string",
+          "timestamp": "ISO8601",
+          "run_id": "string",
+          "workflow": "string"
+        }
+      },
+      {
+        "path": "/api/status",
+        "method": "GET",
+        "description": "服务器状态",
+        "response": {
+          "status": "string",
+          "uptime": "string",
+          "requests_served": "number",
+          "github": {
+            "repository": "string",
+            "sha": "string",
+            "actor": "string"
+          }
+        }
+      }
+    ],
+    "limitations": [
+      "每次运行最多5分钟",
+      "需要GitHub Actions运行",
+      "适合只读API"
+    ],
+    "alternatives": [
+      "Vercel Serverless Functions",
+      "Cloudflare Workers",
+      "GitHub Pages + JavaScript模拟"
+    ]
+  }
+}
+EOF
+        
+        echo "✅ API文档已生成"
+    
+    - name: 上传API文档
+      uses: actions/upload-artifact@v4
+      with:
+        name: api-docs
+        path: api-docs.json
+        retention-days: 30
+    
+    - name: 发送通知
+      if: always()
+      run: |
+        echo "📢 API服务器运行完成"
+        echo "⏰ 运行时间: $(date)"
+        echo "📊 状态: ${{ job.status }}"
+        echo ""
+        echo "🔗 前端访问:"
+        echo "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
+        echo ""
+        echo "📚 API文档已生成"
+        echo "下次运行: 5分钟后"

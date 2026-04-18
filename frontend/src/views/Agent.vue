@@ -358,7 +358,7 @@ import {
   MessageSquare,
   Send
 } from 'lucide-vue-next'
-import { agentAPI } from '@/utils/api'
+import { agentAPI } from '@/api/index.ts'
 
 // 类型定义
 interface Agent {

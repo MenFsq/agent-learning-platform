@@ -108,7 +108,7 @@
 
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import {
   Bell,
   BookOpen,
@@ -132,6 +132,7 @@ import { storeToRefs } from 'pinia'
 import { useAppStore } from '@/store/app'
 
 const route = useRoute()
+const router = useRouter()
 const appStore = useAppStore()
 const { theme } = storeToRefs(appStore)
 
@@ -174,6 +175,8 @@ const resetLocalProfile = () => {
   localStorage.removeItem('refresh_token')
   localStorage.removeItem('user')
   syncUserFromStorage()
+  // 跳转到登录页面
+  router.push('/login')
 }
 
 const navItems = [

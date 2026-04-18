@@ -17,7 +17,11 @@ import { useAppStore } from './store/app'
 const route = useRoute()
 const appStore = useAppStore()
 
-const showHeader = computed(() => String(route.name ?? '') !== 'NotFound')
+const showHeader = computed(() => {
+  const routeName = String(route.name ?? '')
+  // 登录页面和404页面不显示导航栏
+  return routeName !== 'NotFound' && routeName !== 'Login'
+})
 
 onMounted(() => {
   appStore.initialize()

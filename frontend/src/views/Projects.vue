@@ -442,7 +442,7 @@ import {
   CheckCircle,
   Share2
 } from 'lucide-vue-next'
-import { projectAPI } from '@/utils/api'
+import { projectAPI } from '@/api/index.ts'
 
 // 类型定义
 interface Project {

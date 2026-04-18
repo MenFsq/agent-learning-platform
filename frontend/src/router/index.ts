@@ -60,7 +60,12 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: '/login',
-    redirect: '/'
+    name: 'Login',
+    component: () => import('@/views/Login.vue'),
+    meta: {
+      title: '登录',
+      public: true // 标记为公开页面
+    }
   },
   {
     path: '/test',
@@ -85,10 +90,24 @@ const router = createRouter({
   routes
 })
 
-router.beforeEach((to) => {
+router.beforeEach((to, from, next) => {
   // 设置页面标题
   if (to.meta.title) {
     document.title = `${to.meta.title} - Agent Learning Platform`
+  }
+
+  const token = localStorage.getItem('token')
+  const isPublicPage = to.meta.public
+
+  if (!token && !isPublicPage) {
+    // 如果用户未登录且访问的是非公开页面，则重定向到登录页
+    return next('/login')
+  } else if (token && to.path === '/login') {
+    // 如果用户已登录且访问的是登录页，则重定向到首页
+    return next('/')
+  } else {
+    // 其他情况正常访问
+    next()
   }
 })
 

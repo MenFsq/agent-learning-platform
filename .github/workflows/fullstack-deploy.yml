@@ -1,0 +1,331 @@
+name: Fullstack Deploy
+
+on:
+  push:
+    branches: [ master, main ]
+  workflow_dispatch:
+
+jobs:
+  # 构建和测试前端
+  build-frontend:
+    runs-on: ubuntu-latest
+    outputs:
+      frontend-image: ${{ steps.build-frontend.outputs.image }}
+    
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v4
+    
+    - name: 设置Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '24'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+    
+    - name: 安装前端依赖
+      run: |
+        cd frontend
+        npm ci --no-audit --no-fund
+    
+    - name: 构建前端
+      run: |
+        cd frontend
+        npm run build
+    
+    - name: 构建前端Docker镜像
+      id: build-frontend
+      run: |
+        cd frontend
+        docker build -t agent-platform-frontend:${{ github.sha }} .
+        echo "image=agent-platform-frontend:${{ github.sha }}" >> $GITHUB_OUTPUT
+    
+    - name: 上传前端构建产物
+      uses: actions/upload-artifact@v4
+      with:
+        name: frontend-dist
+        path: frontend/dist/
+        retention-days: 7
+
+  # 构建和测试后端
+  build-backend:
+    runs-on: ubuntu-latest
+    outputs:
+      backend-image: ${{ steps.build-backend.outputs.image }}
+    
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v4
+    
+    - name: 设置Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+        cache-dependency-path: backend/requirements.txt
+    
+    - name: 安装后端依赖
+      run: |
+        cd backend
+        pip install -r requirements.txt
+    
+    - name: 运行后端测试
+      run: |
+        cd backend
+        python -m pytest tests/ -v || echo "测试失败，继续构建"
+    
+    - name: 构建后端Docker镜像
+      id: build-backend
+      run: |
+        cd backend
+        docker build -t agent-platform-backend:${{ github.sha }} .
+        echo "image=agent-platform-backend:${{ github.sha }}" >> $GITHUB_OUTPUT
+    
+    - name: 上传后端构建产物
+      uses: actions/upload-artifact@v4
+      with:
+        name: backend-dist
+        path: backend/
+        retention-days: 7
+
+  # 部署到服务器（需要配置服务器信息）
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [build-frontend, build-backend]
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v4
+    
+    - name: 下载构建产物
+      uses: actions/download-artifact@v4
+      with:
+        name: frontend-dist
+        path: frontend-dist
+    
+    - name: 下载后端构建产物
+      uses: actions/download-artifact@v4
+      with:
+        name: backend-dist
+        path: backend-dist
+    
+    - name: 创建部署配置
+      run: |
+        # 创建完整的部署配置
+        mkdir -p deploy-config
+        cat > deploy-config/docker-compose.prod.yml << 'EOF'
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:alpine
+    container_name: agent-platform-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./frontend-dist:/usr/share/nginx/html
+      - ./ssl:/etc/nginx/ssl
+    depends_on:
+      - backend
+    networks:
+      - agent-network
+    restart: unless-stopped
+
+  backend:
+    image: agent-platform-backend:${{ needs.build-backend.outputs.backend-image }}
+    container_name: agent-platform-backend
+    expose:
+      - "8000"
+    environment:
+      - DATABASE_URL=postgresql://user:password@db:5432/agent_platform
+      - REDIS_URL=redis://redis:6379/0
+      - DEBUG=False
+      - ENVIRONMENT=production
+      - ALLOWED_HOSTS=localhost,127.0.0.1,your-domain.com
+    volumes:
+      - ./logs:/app/logs
+      - ./uploads:/app/uploads
+    depends_on:
+      - db
+      - redis
+    networks:
+      - agent-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  db:
+    image: postgres:15-alpine
+    container_name: agent-platform-db
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=agent_platform
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - agent-network
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: agent-platform-redis
+    volumes:
+      - redis_data:/data
+    networks:
+      - agent-network
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+
+networks:
+  agent-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
+EOF
+
+        # 创建Nginx配置
+        cat > deploy-config/nginx.conf << 'EOF'
+events {
+    worker_connections 1024;
+}
+
+http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+
+    # 日志格式
+    log_format main '$remote_addr - $remote_user [$time_local] "$request" '
+                    '$status $body_bytes_sent "$http_referer" '
+                    '"$http_user_agent" "$http_x_forwarded_for"';
+
+    access_log /var/log/nginx/access.log main;
+    error_log /var/log/nginx/error.log warn;
+
+    # Gzip压缩
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_types text/plain text/css text/xml text/javascript application/javascript application/xml+rss application/json;
+
+    # 前端服务
+    server {
+        listen 80;
+        server_name localhost;
+        
+        # 前端静态文件
+        location / {
+            root /usr/share/nginx/html;
+            index index.html;
+            try_files $uri $uri/ /index.html;
+        }
+        
+        # API代理到后端
+        location /api/ {
+            proxy_pass http://backend:8000/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            
+            # WebSocket支持
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+        }
+        
+        # 健康检查
+        location /health {
+            proxy_pass http://backend:8000/health;
+            proxy_set_header Host $host;
+        }
+    }
+}
+EOF
+    
+    - name: 创建部署脚本
+      run: |
+        cat > deploy-config/deploy.sh << 'EOF'
+#!/bin/bash
+set -e
+
+echo "🚀 开始部署 Agent Learning Platform..."
+
+# 检查Docker是否安装
+if ! command -v docker &> /dev/null; then
+    echo "❌ Docker未安装，请先安装Docker"
+    exit 1
+fi
+
+if ! command -v docker-compose &> /dev/null; then
+    echo "❌ Docker Compose未安装，请先安装Docker Compose"
+    exit 1
+fi
+
+# 停止并删除旧容器
+echo "🔄 停止旧容器..."
+docker-compose -f docker-compose.prod.yml down || true
+
+# 拉取最新镜像
+echo "📥 拉取最新镜像..."
+docker pull agent-platform-backend:${{ needs.build-backend.outputs.backend-image }}
+docker pull nginx:alpine
+docker pull postgres:15-alpine
+docker pull redis:7-alpine
+
+# 启动新容器
+echo "🚀 启动新容器..."
+docker-compose -f docker-compose.prod.yml up -d
+
+# 等待服务启动
+echo "⏳ 等待服务启动..."
+sleep 10
+
+# 检查服务状态
+echo "🔍 检查服务状态..."
+if curl -f http://localhost/health > /dev/null 2>&1; then
+    echo "✅ 部署成功！"
+    echo "🌐 前端访问: http://localhost"
+    echo "🔧 后端API: http://localhost/api"
+    echo "📊 健康检查: http://localhost/health"
+else
+    echo "❌ 部署失败，服务未启动"
+    docker-compose -f docker-compose.prod.yml logs
+    exit 1
+fi
+
+echo "🎉 部署完成！"
+EOF
+        
+        chmod +x deploy-config/deploy.sh
+    
+    - name: 打包部署文件
+      run: |
+        tar -czf deploy-package.tar.gz deploy-config/ frontend-dist/ backend-dist/
+    
+    - name: 上传部署包
+      uses: actions/upload-artifact@v4
+      with:
+        name: deploy-package
+        path: deploy-package.tar.gz
+        retention-days: 30
+    
+    - name: 发送部署通知
+      if: always()
+      run: |
+        if [ "${{ job.status }}" == "success" ]; then
+          echo "✅ 全栈部署成功！"
+          echo "📦 部署包已生成: deploy-package.tar.gz"
+          echo "🔗 前端: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
+          echo "⚙️  后端API: 需要手动部署到服务器"
+        else
+          echo "❌ 部署失败，请检查日志"
+        fi

@@ -24,10 +24,10 @@ export default defineConfig({
     port: 5174,
     host: true,
     proxy: {
-      '/api': {
+      '^/api/.*': {
         target: 'http://localhost:8005',
-        changeOrigin: true
-        // 注意：不要移除 /api 前缀，因为完整版后端期望 /api/v1/agents 路径
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, '')
       }
     }
   },

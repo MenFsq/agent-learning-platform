@@ -141,7 +141,7 @@ import { ElMessage } from 'element-plus'
 import { User, Lock } from '@element-plus/icons-vue'
 import type { FormInstance, FormRules } from 'element-plus'
 
-import { authAPI } from '@/utils/api'
+import { authAPI } from '@/api/index.ts'
 
 const orbitNodes = [
   {
