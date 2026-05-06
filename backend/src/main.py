@@ -11,7 +11,7 @@ from loguru import logger
 
 from .core.config import settings
 from .core.database import init_db, close_db, check_database_health
-from .middleware import logging, auth, cors
+from .middleware import logging, auth
 from .api.v1 import router as api_v1_router
 
 
@@ -35,6 +35,21 @@ async def lifespan(app: FastAPI):
     
     # 应用启动完成
     logger.info("Application started successfully")
+    
+    # 开发环境：预置测试用户
+    if settings.DEBUG:
+        from .api.v1.auth import _dev_users
+        from .core.security import get_password_hash
+        dev_id = "dev-user-001"
+        if "admin" not in _dev_users:
+            _dev_users["admin"] = {
+                "id": dev_id,
+                "username": "admin",
+                "email": "admin@platform.local",
+                "hashed_password": get_password_hash("admin123"),
+                "is_active": True,
+            }
+            logger.info(f"Dev user created: admin / admin123")
     
     yield
     
@@ -79,7 +94,7 @@ app = FastAPI(
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     """全局异常处理器"""
-    logger.error(f"Unhandled exception: {exc}", exc_info=True)
+    logger.opt(exception=True).error("Unhandled exception")
     
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -113,9 +128,14 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
 
 # 添加中间件
+# 开发环境允许所有来源
+if settings.DEBUG:
+    allow_origins = ["*"]
+else:
+    allow_origins = [str(origin) for origin in settings.CORS_ORIGINS]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[str(origin) for origin in settings.CORS_ORIGINS],
+    allow_origins=allow_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

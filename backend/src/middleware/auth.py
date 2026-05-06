@@ -28,11 +28,27 @@ async def auth_middleware(request: Request, call_next: Callable) -> Response:
         "/api/v1/auth/login",
         "/api/v1/auth/register",
         "/api/v1/auth/refresh",
-        "/api/v1/auth/verify-email"
+        "/api/v1/auth/verify-email",
+        "/api/v1/auth/login/json",
+        "/api/v1/agents",
+        "/api/v1/agents/"
     ]
     
     # 检查是否为公开路径
-    if request.url.path in public_paths or request.url.path.startswith("/static/"):
+    is_public = (
+        request.url.path in public_paths
+        or request.url.path.startswith("/static/")
+    )
+    # 开发环境下所有 /api/v1/ 路径免认证
+    if settings.DEBUG and request.url.path.startswith("/api/v1/"):
+        # 注入dev用户到request state
+        request.state.user = {
+            "sub": "dev-user-001",
+            "username": "admin",
+            "role": "admin",
+            "permissions": ["read", "write", "admin"]
+        }
+        return await call_next(request)
         return await call_next(request)
     
     # 获取授权头

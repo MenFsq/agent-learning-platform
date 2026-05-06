@@ -223,14 +223,26 @@
               <div class="console-input">
                 <el-input
                   v-model="consoleInput"
-                  placeholder="输入指令或问题..."
+                  placeholder="输入问题，按 Enter 发送..."
                   :prefix-icon="MessageSquare"
+                  :disabled="chatLoading"
                   @keyup.enter="sendToAgent"
                 >
                   <template #append>
-                    <el-button :icon="Send" @click="sendToAgent" />
+                    <el-button 
+                      :icon="chatLoading ? Loader2 : Send" 
+                      :class="{ 'is-loading': chatLoading }"
+                      @click="sendToAgent" 
+                      :disabled="chatLoading"
+                    />
                   </template>
                 </el-input>
+              </div>
+              <div v-if="chatLoading" class="console-typing">
+                <span class="typing-dot"></span>
+                <span class="typing-dot"></span>
+                <span class="typing-dot"></span>
+                <span class="typing-text">Agent 正在思考...</span>
               </div>
               <div class="console-output" ref="consoleOutput">
                 <div
@@ -297,10 +309,11 @@
         </el-form-item>
         <el-form-item label="模型配置" prop="model">
           <el-select v-model="agentForm.model" placeholder="选择模型">
+            <el-option label="DeepSeek Chat (推荐)" value="deepseek-chat" />
+            <el-option label="DeepSeek Reasoner" value="deepseek-reasoner" />
             <el-option label="GPT-4" value="gpt-4" />
             <el-option label="GPT-3.5 Turbo" value="gpt-3.5-turbo" />
             <el-option label="Claude 3" value="claude-3" />
-            <el-option label="本地模型" value="local" />
           </el-select>
         </el-form-item>
         <el-form-item label="温度" prop="temperature">
@@ -356,7 +369,8 @@ import {
   Settings,
   Terminal,
   MessageSquare,
-  Send
+  Send,
+  Loader2
 } from 'lucide-vue-next'
 import { agentAPI } from '@/api/index.ts'
 
@@ -405,7 +419,7 @@ const agentForm = ref({
   name: '',
   description: '',
   type: 'conversational',
-  model: 'gpt-3.5-turbo',
+  model: 'deepseek-chat',
   temperature: 0.7,
   memory: false,
   tools: [] as string[]
@@ -463,7 +477,7 @@ const createNewAgent = () => {
     name: '',
     description: '',
     type: 'conversational',
-    model: 'gpt-3.5-turbo',
+    model: 'deepseek-chat',
     temperature: 0.7,
     memory: false,
     tools: []
@@ -638,19 +652,27 @@ const refreshAgents = async () => {
   }
 }
 
+const chatLoading = ref(false)
+
 const sendToAgent = async () => {
-  if (!consoleInput.value.trim() || !activeAgent.value) return
+  if (!consoleInput.value.trim() || !activeAgent.value || chatLoading.value) return
   
   const userMessage = consoleInput.value.trim()
   addConsoleMessage('user', userMessage)
   consoleInput.value = ''
+  chatLoading.value = true
   
   try {
     const response = await agentAPI.interactWithAgent(activeAgent.value.id, userMessage)
-    addConsoleMessage('agent', response.data.response)
-  } catch (error) {
+    // 响应可能是 { data: { response: ... } } 或直接 { response: ... }
+    const reply = response.data?.response || response.response || 'No response'
+    addConsoleMessage('agent', reply)
+  } catch (error: any) {
     console.error('与 Agent 交互失败:', error)
-    addConsoleMessage('system', '与 Agent 交互失败，请检查 Agent 状态')
+    const errMsg = error?.response?.data?.detail || error?.response?.data?.error?.message || '与 Agent 交互失败'
+    addConsoleMessage('system', '❌ ' + errMsg)
+  } finally {
+    chatLoading.value = false
   }
 }
 
@@ -1274,8 +1296,48 @@ onMounted(async () => {
   width: 100%;
 }
 
+.console-typing {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  animation: fadeIn 0.3s ease;
+}
+
+.typing-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  animation: typingBounce 1.4s infinite ease-in-out both;
+  
+  &:nth-child(1) { animation-delay: 0s; }
+  &:nth-child(2) { animation-delay: 0.2s; }
+  &:nth-child(3) { animation-delay: 0.4s; }
+}
+
+.typing-text {
+  margin-left: 4px;
+  font-size: 12px;
+  color: var(--text-tertiary, #94a3b8);
+}
+
+@keyframes typingBounce {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+  40% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 .console-output {
-  height: 300px;
+  min-height: 500px;
+  height: calc(100vh - 420px);
+  max-height: 800px;
   background: var(--app-bg);
   border: 1px solid var(--line-soft);
   border-radius: 8px;

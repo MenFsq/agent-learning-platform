@@ -608,13 +608,12 @@ const formatDate = (dateString?: string) => {
 const refreshProjects = async () => {
   try {
     loading.value = true
-    const response = await projectAPI.getMyProjects()
-    projects.value = response.data
+    const response = await projectAPI.getProjects()
+    // 后端返回 { projects: [...], total, page, ... }
+    projects.value = response.data.projects || response.data || []
     
     // 更新统计数据
     updateStats()
-    
-    ElMessage.success('项目列表刷新成功')
   } catch (error) {
     console.error('获取项目列表失败:', error)
     ElMessage.error('获取项目列表失败')

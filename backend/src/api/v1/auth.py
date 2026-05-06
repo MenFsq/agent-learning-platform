@@ -25,6 +25,9 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
 # OAuth2密码流
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
+# 开发环境内存用户（绕过数据库）
+_dev_users = {}
+
 
 # 请求和响应模型
 class UserRegister(BaseModel):
@@ -60,16 +63,9 @@ class UserRegister(BaseModel):
 
 class UserLogin(BaseModel):
     """用户登录请求模型"""
-    email: Optional[EmailStr] = None
+    email: Optional[str] = None
     username: Optional[str] = None
     password: str
-    
-    @validator('email', 'username')
-    def validate_identifier(cls, v, values):
-        # 确保至少提供邮箱或用户名之一
-        if not values.get('email') and not values.get('username'):
-            raise ValueError('Either email or username must be provided')
-        return v
 
 
 class TokenResponse(BaseModel):
@@ -273,9 +269,7 @@ async def login(
         return TokenResponse(
             access_token=access_token,
             refresh_token=refresh_token,
-            expires_in=30 * 60,  # 30分钟
-            user_id=user["id"],
-            username=user["username"]
+            expires_in=30 * 60,
         )
         
     except HTTPException:
@@ -286,6 +280,45 @@ async def login(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Login failed"
         )
+
+
+@router.post("/login/json", response_model=TokenResponse)
+async def login_json(login_data: UserLogin):
+    """用户登录（JSON格式，供前端使用）"""
+    identifier = login_data.username or login_data.email or ""
+    
+    # 检查开发环境内存用户
+    dev_user = _dev_users.get(identifier)
+    if dev_user and verify_password(login_data.password, dev_user["hashed_password"]):
+        access_token = create_access_token(data={"sub": dev_user["id"], "username": dev_user["username"]})
+        refresh_token = create_refresh_token(data={"sub": dev_user["id"], "username": dev_user["username"]})
+        return TokenResponse(access_token=access_token, refresh_token=refresh_token, expires_in=30*60, user_id=dev_user["id"], username=dev_user["username"])
+    
+    # 回退到数据库查找
+    try:
+        from ...core.database import get_db
+        db_gen = get_db()
+        db = await db_gen.__anext__()
+        
+        user = None
+        if "@" in identifier:
+            user = await UserService.get_user_by_email(db, identifier)
+        else:
+            user = await UserService.get_user_by_username(db, identifier)
+        
+        if not user:
+            raise HTTPException(status_code=401, detail="Incorrect username or password")
+        if not verify_password(login_data.password, user["hashed_password"]):
+            raise HTTPException(status_code=401, detail="Incorrect username or password")
+        
+        access_token = create_access_token(data={"sub": user["id"], "username": user["username"]})
+        refresh_token = create_refresh_token(data={"sub": user["id"], "username": user["username"]})
+        return TokenResponse(access_token=access_token, refresh_token=refresh_token, expires_in=30*60, user_id=user["id"], username=user["username"])
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"JSON Login error: {e}")
+        raise HTTPException(status_code=401, detail="Incorrect username or password")
 
 
 @router.post("/refresh", response_model=TokenResponse)

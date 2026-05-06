@@ -98,7 +98,7 @@
             <div class="login-footer">
               <div class="demo-account">
                 <span>演示账号</span>
-                <strong class="metric-mono">testuser / testpass</strong>
+                <strong class="metric-mono">admin / admin123</strong>
               </div>
 
               <div class="quick-login">
@@ -187,7 +187,7 @@ const loginRules: FormRules = {
   ]
 }
 
-const buildUserProfile = (user: { id: number; username: string; email: string; full_name?: string | null }) => ({
+const buildUserProfile = (user: { id: string | number; username: string; email: string; full_name?: string | null }) => ({
   id: user.id,
   username: user.username,
   email: user.email,
@@ -226,10 +226,10 @@ const handleLogin = async () => {
       password: loginForm.password
     })
 
-    const { access_token, refresh_token, user } = response.data
+    const { access_token, refresh_token, user_id, username } = response.data
     localStorage.setItem('token', access_token)
     localStorage.setItem('refresh_token', refresh_token)
-    localStorage.setItem('user', JSON.stringify(buildUserProfile(user)))
+    localStorage.setItem('user', JSON.stringify(buildUserProfile({ id: user_id, username, email: username + '@platform.local', full_name: username })))
 
     // 记住我功能
     if (loginForm.remember) {
@@ -250,16 +250,8 @@ const handleLogin = async () => {
 
 // 快速登录
 const quickLogin = (type: string) => {
-  if (type === 'admin') {
-    loginForm.username = 'testuser'
-    loginForm.password = 'testpass'
-  } else if (type === 'user') {
-    loginForm.username = 'testuser'
-    loginForm.password = 'testpass'
-  } else {
-    loginForm.username = 'testuser'
-    loginForm.password = 'testpass'
-  }
+  loginForm.username = 'admin'
+  loginForm.password = 'admin123'
 
   // 自动触发登录
   setTimeout(() => {
