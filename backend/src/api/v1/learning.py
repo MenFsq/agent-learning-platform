@@ -6,7 +6,7 @@
 from typing import List, Optional
 from datetime import datetime
 from pydantic import BaseModel, Field
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Body, HTTPException, Query
 
 router = APIRouter(prefix="/learning", tags=["learning"])
 
@@ -389,7 +389,7 @@ async def get_user_progress(user_id: str):
 async def update_course_progress(
     user_id: str,
     course_id: str,
-    progress: float = Field(..., ge=0.0, le=100.0, description="进度百分比"),
+    progress: float = Body(..., ge=0.0, le=100.0, description="进度百分比"),
     completed_lesson_id: Optional[str] = None,
     notes: Optional[str] = None
 ):
@@ -589,8 +589,8 @@ async def get_recommendations(
 async def rate_course(
     course_id: str,
     user_id: str = "current_user",
-    rating: float = Field(..., ge=0.0, le=5.0, description="评分 (0-5)"),
-    review: Optional[str] = Field(None, max_length=1000, description="评价内容")
+    rating: float = Body(..., ge=0.0, le=5.0, description="评分 (0-5)"),
+    review: Optional[str] = Body(None, max_length=1000, description="评价内容")
 ):
     """
     为课程评分

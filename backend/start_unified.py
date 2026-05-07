@@ -24,6 +24,14 @@ from sqlalchemy import JSON, Boolean, DateTime, Enum, ForeignKey, Integer, Strin
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, declarative_base, mapped_column
 
+# OpenAI/DeepSeek 直接集成
+OPENAI_AVAILABLE = False
+try:
+    from openai import OpenAI
+    OPENAI_AVAILABLE = True
+except ImportError:
+    OPENAI_AVAILABLE = False
+
 from src.core.config import settings
 from src.core.database import AsyncSessionLocal, engine, get_db
 from src.core.security import create_access_token, create_refresh_token, decode_token, get_password_hash, verify_password
@@ -132,7 +140,7 @@ class User(APP_BASE):
     full_name: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
     avatar_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
     bio: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    role: Mapped[UserRole] = mapped_column(Enum(UserRole), default=UserRole.USER, nullable=False)
+    role: Mapped[str] = mapped_column(String(20), default="user", nullable=False)  # 原为Enum(UserRole)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     is_verified: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     last_login: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
@@ -178,8 +186,8 @@ class Project(APP_BASE):
     slug: Mapped[str] = mapped_column(String(200), unique=True, index=True, nullable=False)
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     short_description: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
-    status: Mapped[ProjectStatus] = mapped_column(Enum(ProjectStatus), default=ProjectStatus.DRAFT, nullable=False)
-    type: Mapped[ProjectType] = mapped_column(Enum(ProjectType), default=ProjectType.LEARNING, nullable=False)
+    status: Mapped[str] = mapped_column(String(50), default="draft", nullable=False)  # 修复: 将Enum改为String
+    type: Mapped[str] = mapped_column(String(50), default="learning", nullable=False)  # 修复: 将Enum改为String
     tags: Mapped[List[str]] = mapped_column(JSON, default=list, nullable=False)
     technologies: Mapped[List[str]] = mapped_column(JSON, default=list, nullable=False)
     config: Mapped[Dict[str, Any]] = mapped_column(JSON, default=dict, nullable=False)
@@ -488,6 +496,49 @@ class UnifiedAgentManager:
         self.agent_start_times.pop(agent_id, None)
 
     def _fallback_response(self, agent: UnifiedAgentRecord, message: str) -> str:
+        # 首先尝试使用真实的DeepSeek API
+        if OPENAI_AVAILABLE:
+            try:
+                llm_settings = resolve_llm_provider_settings(agent.config.get("model") if agent.config else None)
+                api_key = llm_settings.get("api_key")
+                base_url = llm_settings.get("base_url")
+                model = llm_settings.get("model", "deepseek-chat")
+                
+                if api_key:
+                    client = OpenAI(
+                        api_key=api_key,
+                        base_url=base_url
+                    )
+                    
+                    system_prompt = agent.config.get("system_prompt", "你是一个有帮助的AI助手。") if agent.config else "你是一个有帮助的AI助手。"
+                    
+                    response = client.chat.completions.create(
+                        model=model,
+                        messages=[
+                            {"role": "system", "content": system_prompt},
+                            {"role": "user", "content": message}
+                        ],
+                        max_tokens=agent.config.get("max_tokens", 2000) if agent.config else 2000,
+                        temperature=agent.config.get("temperature", 0.7) if agent.config else 0.7
+                    )
+                    
+                    content = response.choices[0].message.content
+                    # 确保内容是字符串且编码正确
+                    if isinstance(content, str):
+                        # 如果内容看起来是乱码，尝试修复编码
+                        # DeepSeek API有时返回的UTF-8文本在Windows上显示为乱码
+                        try:
+                            # 尝试UTF-8解码再编码，确保编码正确
+                            utf8_bytes = content.encode('utf-8')
+                            return utf8_bytes.decode('utf-8')
+                        except:
+                            return content
+                    return content
+            except Exception as e:
+                # 如果API调用失败，回退到模拟响应
+                print(f"DeepSeek API调用失败，使用模拟响应: {e}")
+        
+        # 回退到模拟响应
         tool_hint = "、".join((agent.config or {}).get("tools", [])) or "无工具"
         templates = [
             f"{agent.name} 已收到请求：{message}",
@@ -824,7 +875,7 @@ async def health_check() -> Dict[str, Any]:
         "version": "1.0.0",
         "database": "connected" if DB_BOOTSTRAP_OK else "unavailable",
         "database_error": DB_BOOTSTRAP_ERROR,
-        "langchain": "integrated" if LANGCHAIN_AVAILABLE else "mock-fallback",
+        "langchain": "integrated" if LANGCHAIN_AVAILABLE else ("openai-direct" if OPENAI_AVAILABLE else "mock-fallback"),
         "agents_count": agents_count,
         "timestamp": iso_now(),
     }

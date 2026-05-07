@@ -97,8 +97,7 @@ wheels/
 .cache/
 .parcel-cache/
 
-# 包管理器锁文件
-package-lock.json
+# 包管理器锁文件（前端 lockfile 需提交以保证 CI 可重现）
 yarn.lock
 pnpm-lock.yaml
 
