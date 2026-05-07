@@ -7,8 +7,12 @@ services:
   # ============================================================
   - type: web
     name: agent-learning-platform-backend
-    env: docker
+    env: python
+    runtime: python-3.12
     plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: python run.py
     healthCheckPath: /health
     envVars:
       - key: DATABASE_URL

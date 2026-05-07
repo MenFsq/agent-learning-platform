@@ -79,10 +79,18 @@ settings = Settings()
 
 
 def get_database_url() -> str:
-    """获取数据库URL，测试环境使用测试数据库"""
+    """获取数据库URL，测试环境使用测试数据库。
+    自动将 Render 提供的 postgres:// 转换为 SQLAlchemy async 所需的 postgresql+asyncpg://"""
     if settings.ENVIRONMENT == "test" and settings.DATABASE_TEST_URL:
-        return str(settings.DATABASE_TEST_URL)
-    return str(settings.DATABASE_URL)
+        url = str(settings.DATABASE_TEST_URL)
+    else:
+        url = str(settings.DATABASE_URL)
+    # Render 给的连接串是 postgres://，SQLAlchemy async 需要 postgresql+asyncpg://
+    if url.startswith("postgres://"):
+        url = url.replace("postgres://", "postgresql+asyncpg://", 1)
+    elif url.startswith("postgresql://"):
+        url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+    return url
 
 
 def is_development() -> bool:
