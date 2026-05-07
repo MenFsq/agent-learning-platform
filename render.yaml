@@ -1,0 +1,54 @@
+# Render Blueprint — 一键部署全栈
+# 部署方式: 把此文件提交到 GitHub，在 Render Dashboard 选 "Blueprint" 连接仓库即可
+
+services:
+  # ============================================================
+  # 后端 API 服务
+  # ============================================================
+  - type: web
+    name: agent-learning-platform-backend
+    env: docker
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: agent-platform-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEEPSEEK_API_KEY
+        sync: false
+      - key: DEEPSEEK_BASE_URL
+        value: https://api.deepseek.com
+      - key: DEFAULT_CHAT_MODEL
+        value: deepseek-v4-flash
+      - key: DEFAULT_REASONER_MODEL
+        value: deepseek-v4-pro
+      - key: DEBUG
+        value: "false"
+      - key: ENVIRONMENT
+        value: production
+      - key: CORS_ORIGINS
+        value: '["https://menfsq.github.io","http://localhost:3000"]'
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "60"
+      - key: REFRESH_TOKEN_EXPIRE_DAYS
+        value: "14"
+      - key: LOG_LEVEL
+        value: INFO
+
+  # ============================================================
+  # Redis 缓存（可选，暂时注释掉节省费用）
+  # ============================================================
+  # - type: redis
+  #   name: agent-platform-redis
+  #   plan: free
+  #   ipAllowList: []
+
+# ============================================================
+# PostgreSQL 数据库
+# ============================================================
+databases:
+  - name: agent-platform-db
+    plan: free
