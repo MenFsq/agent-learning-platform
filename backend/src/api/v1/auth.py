@@ -8,6 +8,8 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel, EmailStr, validator
 
+from sqlalchemy import select
+
 from ...core.database import get_db
 from ...core.security import (
     verify_password,
@@ -18,15 +20,13 @@ from ...core.security import (
     validate_password_strength,
     SecurityUtils
 )
+from ...models.user import User, UserRole
 from ...middleware.logging import logger
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 # OAuth2密码流
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
-
-# 开发环境内存用户（绕过数据库）
-_dev_users = {}
 
 
 # 请求和响应模型
@@ -115,43 +115,76 @@ class ChangePasswordRequest(BaseModel):
         return v
 
 
-# 用户服务（模拟）
+# 用户服务（数据库实现）
 class UserService:
-    """用户服务类"""
-    
+    """用户服务类 — 真实数据库操作"""
+
+    @staticmethod
+    def _to_dict(user: User) -> dict:
+        """ORM 对象转字典（兼容现有调用方，ID 转字符串）"""
+        return {
+            "id": str(user.id),
+            "email": user.email,
+            "username": user.username,
+            "hashed_password": user.hashed_password,
+            "full_name": user.full_name,
+            "avatar_url": user.avatar_url,
+            "bio": user.bio,
+            "role": user.role.value if user.role else "user",
+            "is_active": user.is_active,
+            "is_verified": user.is_verified,
+            "last_login": user.last_login.isoformat() if user.last_login else None,
+            "created_at": user.created_at.isoformat() if user.created_at else None,
+        }
+
     @staticmethod
     async def get_user_by_email(db: AsyncSession, email: str):
         """根据邮箱获取用户"""
-        # 这里应该从数据库查询用户
-        # 暂时返回模拟数据
-        return None
-    
+        result = await db.execute(select(User).where(User.email == email))
+        user = result.scalar_one_or_none()
+        return UserService._to_dict(user) if user else None
+
     @staticmethod
     async def get_user_by_username(db: AsyncSession, username: str):
         """根据用户名获取用户"""
-        # 这里应该从数据库查询用户
-        # 暂时返回模拟数据
-        return None
-    
+        result = await db.execute(select(User).where(User.username == username))
+        user = result.scalar_one_or_none()
+        return UserService._to_dict(user) if user else None
+
+    @staticmethod
+    async def get_user_by_id(db: AsyncSession, user_id: int):
+        """根据ID获取用户"""
+        result = await db.execute(select(User).where(User.id == user_id))
+        user = result.scalar_one_or_none()
+        return UserService._to_dict(user) if user else None
+
     @staticmethod
     async def create_user(db: AsyncSession, user_data: dict):
         """创建用户"""
-        # 这里应该将用户保存到数据库
-        # 暂时返回模拟数据
-        return {
-            "id": "user_123",
-            "email": user_data["email"],
-            "username": user_data["username"],
-            "hashed_password": get_password_hash(user_data["password"]),
-            "is_active": True,
-            "created_at": "2026-04-14T23:50:00Z"
-        }
-    
+        user = User(
+            email=user_data["email"],
+            username=user_data["username"],
+            hashed_password=get_password_hash(user_data["password"]),
+            full_name=user_data.get("full_name"),
+            role=UserRole.USER,
+            is_active=True,
+            is_verified=False,
+        )
+        db.add(user)
+        await db.flush()
+        await db.refresh(user)
+        logger.info(f"User created: id={user.id} username={user.username}")
+        return UserService._to_dict(user)
+
     @staticmethod
-    async def update_last_login(db: AsyncSession, user_id: str):
+    async def update_last_login(db: AsyncSession, user_id):
         """更新最后登录时间"""
-        # 这里应该更新数据库中的最后登录时间
-        pass
+        from datetime import datetime
+        result = await db.execute(select(User).where(User.id == int(user_id)))
+        user = result.scalar_one_or_none()
+        if user:
+            user.last_login = datetime.utcnow()
+            await db.flush()
 
 
 @router.post("/register", response_model=TokenResponse)
@@ -270,6 +303,8 @@ async def login(
             access_token=access_token,
             refresh_token=refresh_token,
             expires_in=30 * 60,
+            user_id=user["id"],
+            username=user["username"]
         )
         
     except HTTPException:
@@ -283,42 +318,37 @@ async def login(
 
 
 @router.post("/login/json", response_model=TokenResponse)
-async def login_json(login_data: UserLogin):
+async def login_json(
+    login_data: UserLogin,
+    db: AsyncSession = Depends(get_db)
+):
     """用户登录（JSON格式，供前端使用）"""
     identifier = login_data.username or login_data.email or ""
-    
-    # 检查开发环境内存用户
-    dev_user = _dev_users.get(identifier)
-    if dev_user and verify_password(login_data.password, dev_user["hashed_password"]):
-        access_token = create_access_token(data={"sub": dev_user["id"], "username": dev_user["username"]})
-        refresh_token = create_refresh_token(data={"sub": dev_user["id"], "username": dev_user["username"]})
-        return TokenResponse(access_token=access_token, refresh_token=refresh_token, expires_in=30*60, user_id=dev_user["id"], username=dev_user["username"])
-    
-    # 回退到数据库查找
-    try:
-        from ...core.database import get_db
-        db_gen = get_db()
-        db = await db_gen.__anext__()
-        
-        user = None
-        if "@" in identifier:
-            user = await UserService.get_user_by_email(db, identifier)
-        else:
-            user = await UserService.get_user_by_username(db, identifier)
-        
-        if not user:
-            raise HTTPException(status_code=401, detail="Incorrect username or password")
-        if not verify_password(login_data.password, user["hashed_password"]):
-            raise HTTPException(status_code=401, detail="Incorrect username or password")
-        
-        access_token = create_access_token(data={"sub": user["id"], "username": user["username"]})
-        refresh_token = create_refresh_token(data={"sub": user["id"], "username": user["username"]})
-        return TokenResponse(access_token=access_token, refresh_token=refresh_token, expires_in=30*60, user_id=user["id"], username=user["username"])
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"JSON Login error: {e}")
+
+    user = None
+    if "@" in identifier:
+        user = await UserService.get_user_by_email(db, identifier)
+    else:
+        user = await UserService.get_user_by_username(db, identifier)
+
+    if not user:
         raise HTTPException(status_code=401, detail="Incorrect username or password")
+    if not verify_password(login_data.password, user["hashed_password"]):
+        raise HTTPException(status_code=401, detail="Incorrect username or password")
+    if not user.get("is_active", True):
+        raise HTTPException(status_code=400, detail="User account is inactive")
+
+    await UserService.update_last_login(db, user["id"])
+
+    access_token = create_access_token(data={"sub": user["id"], "username": user["username"]})
+    refresh_token = create_refresh_token(data={"sub": user["id"], "username": user["username"]})
+    return TokenResponse(
+        access_token=access_token,
+        refresh_token=refresh_token,
+        expires_in=30 * 60,
+        user_id=user["id"],
+        username=user["username"]
+    )
 
 
 @router.post("/refresh", response_model=TokenResponse)
@@ -403,15 +433,21 @@ async def get_profile(
                 detail="Invalid token"
             )
         
-        # 这里应该从数据库获取用户资料
-        # 暂时返回模拟数据
+        # 从数据库获取用户资料
+        user = await UserService.get_user_by_id(db, int(user_id))
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found"
+            )
+        
         return UserProfile(
-            id=user_id,
-            email="user@example.com",
-            username=payload.get("username", "user"),
-            is_active=True,
-            created_at="2026-04-14T23:50:00Z",
-            last_login="2026-04-14T23:55:00Z"
+            id=user["id"],
+            email=user["email"],
+            username=user["username"],
+            is_active=user["is_active"],
+            created_at=user.get("created_at", ""),
+            last_login=user.get("last_login")
         )
         
     except HTTPException:
