@@ -71,14 +71,17 @@ jobs:
           context: .
           file: backend/Dockerfile
           push: true
+          pull: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
   # ============================================================
   # 前端构建 + GitHub Pages 部署
   # ============================================================
   frontend-deploy:
-    needs: backend-build
+    needs: []  # 不依赖 backend-build，前端可独立部署
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     permissions:
