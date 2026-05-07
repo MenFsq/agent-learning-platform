@@ -75,7 +75,6 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
-          cache-to: type=gha,mode=max
 
   # ============================================================
   # 前端构建 + GitHub Pages 部署
