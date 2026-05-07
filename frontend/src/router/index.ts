@@ -64,7 +64,16 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/Login.vue'),
     meta: {
       title: '登录',
-      public: true // 标记为公开页面
+      public: true
+    }
+  },
+  {
+    path: '/register',
+    name: 'Register',
+    component: () => import('@/views/Register.vue'),
+    meta: {
+      title: '注册',
+      public: true
     }
   },
   {

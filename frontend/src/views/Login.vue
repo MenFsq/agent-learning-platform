@@ -96,6 +96,11 @@
             </el-button>
 
             <div class="login-footer">
+              <div class="register-link">
+                <span>没有账号？</span>
+                <el-link type="primary" @click="goRegister">立即注册</el-link>
+              </div>
+
               <div class="demo-account">
                 <span>演示账号</span>
                 <strong class="metric-mono">admin / admin123</strong>
@@ -257,6 +262,10 @@ const quickLogin = (type: string) => {
   setTimeout(() => {
     handleLogin()
   }, 100)
+}
+
+const goRegister = () => {
+  router.push('/register')
 }
 
 onMounted(() => {
@@ -776,6 +785,16 @@ onMounted(() => {
   border-top: 1px solid var(--line-soft);
   display: grid;
   gap: 14px;
+}
+
+.register-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  padding-bottom: 8px;
 }
 
 .demo-account {
