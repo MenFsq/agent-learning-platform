@@ -168,3 +168,5 @@ exports/
 
 # 鐢ㄦ埛涓婁紶鏂囦欢
 uploads/
+# 归档的调试/一次性脚本
+scripts/archive/
